@@ -47,8 +47,8 @@ export default function AdminDisasterRecoveryPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Disaster Recovery"
-        subtitle="Continuidad en todas las organizaciones: políticas, drills de failover y backups. Resultados reales del período."
+        title="Recuperación ante desastres"
+        subtitle="Continuidad en todas las organizaciones: políticas, simulacros de failover y backups. Resultados reales del período."
       />
       {error && <ErrorInline>{error}</ErrorInline>}
       {loading ? (
@@ -70,7 +70,7 @@ export default function AdminDisasterRecoveryPage() {
               hint={`${dash?.drill_success_rate ?? 0}% de éxito reportado`}
             />
             <Metric
-              label="Backups"
+              label="Copias de seguridad"
               value={dash?.backups_total ?? 0}
               size="md"
               hint={`${dash?.restores_30d ?? 0} restores en 30d`}

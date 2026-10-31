@@ -23,7 +23,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "dashboard",
     target: "nav-dashboard",
     title: "Panel general",
-    body: "Resumen del tenant: salud del sistema, uso reciente y lo que pide atención. Entra aquí cuando quieras ver si algo está roto o cuánto consumiste, sin recorrer cada módulo.",
+    body: "Resumen de la organización: salud del sistema, uso reciente y lo que pide atención. Entra aquí cuando quieras ver si algo está roto o cuánto consumiste, sin recorrer cada módulo.",
   },
   {
     id: "build",
@@ -127,7 +127,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "govern",
     target: "nav-group-gobernar",
     title: "Gobernar",
-    body: "Seguridad, auditoría, riesgo, cumplimiento y continuidad. Este bloque no construye agentes: deja registro de quién cambió qué y qué controles protegen al tenant. Entra cuando tienes que responder a una revisión interna o de un cliente.",
+    body: "Seguridad, auditoría, riesgo, cumplimiento y continuidad. Este bloque no construye agentes: deja registro de quién cambió qué y qué controles protegen a la organización. Entra cuando tienes que responder a una revisión interna o de un cliente.",
   },
   {
     id: "team",
@@ -141,14 +141,14 @@ export const TOUR_STEPS: TourStep[] = [
     target: "nav-billing",
     navKey: "billing",
     title: "Facturación",
-    body: "Plan, consumo facturable y límites del tenant. Revisa esta página si el trial se acaba, si vas a subir de plan o si un tope de requests te está cortando.",
+    body: "Plan, consumo facturable y límites de la organización. Revisa esta página si el trial se acaba, si vas a subir de plan o si un tope de requests te está cortando.",
   },
   {
     id: "security",
     target: "nav-security",
     navKey: "audit",
     title: "Seguridad y Auditoría",
-    body: "Auditoría de acciones sensibles y controles de seguridad del tenant. Úsalo para ver quién cambió qué, o para cumplir una revisión interna.",
+    body: "Auditoría de acciones sensibles y controles de seguridad de la organización. Úsalo para ver quién cambió qué, o para cumplir una revisión interna.",
   },
   {
     id: "settings",
@@ -167,7 +167,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "workspace",
     target: "workspace-selector",
     title: "Workspace",
-    body: "Cambia entre workspaces de la misma organización sin volver a iniciar sesión. Úsalo si tienes demo y negocio separados, o varios equipos en un mismo tenant.",
+    body: "Cambia entre workspaces de la misma organización sin volver a iniciar sesión. Úsalo si tienes demo y negocio separados, o varios equipos en una misma organización.",
   },
   {
     id: "search",

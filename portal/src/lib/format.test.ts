@@ -23,10 +23,10 @@ describe("fmtNum", () => {
 });
 
 describe("fmtDate / fmtDateTime", () => {
-  it("formatea ISO con el locale es-PE", () => {
+  it("formatea en dd/mm/aaaa (glosario §4)", () => {
     const d = new Date(2026, 0, 5, 9, 30).toISOString();
-    expect(fmtDate(d)).toMatch(/ene/i);
-    expect(fmtDateTime(d)).toContain("09");
+    expect(fmtDate(d)).toBe("05/01/2026");
+    expect(fmtDateTime(d)).toBe("05/01/2026 09:30");
   });
   it("devuelve — para entradas inválidas", () => {
     expect(fmtDate(null)).toBe("—");

@@ -147,7 +147,7 @@ function SourcesCard({ event, detailed }: { event: StoryEvent; detailed: boolean
       {authorities.length ? (
         <div className="mb-1.5 flex flex-wrap gap-1">
           {authorities.map(([level, count]) => (
-            <Badge key={level} tone="neutral" title="Autoridad de la fuente configurada por el tenant">
+            <Badge key={level} tone="neutral" title="Autoridad de la fuente configurada por la organización">
               {authorityLabel(level)}: {count}
             </Badge>
           ))}

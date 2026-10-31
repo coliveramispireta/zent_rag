@@ -83,7 +83,7 @@ export default function Subscriptions() {
   const columns: Column<Subscription>[] = [
     {
       key: "tenant",
-      header: "Tenant",
+      header: "Organización",
       sortable: true,
       render: (s) => (
         <Link
@@ -132,7 +132,7 @@ export default function Subscriptions() {
   return (
     <div>
       <PageHeader
-        title="Subscriptions"
+        title="Suscripciones"
         subtitle="Todas las suscripciones de la plataforma, con plan, estado y período."
       />
       <DataTable

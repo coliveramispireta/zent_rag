@@ -360,7 +360,7 @@ export default function RiskCenterPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Risk & Compliance Center"
+        title="Centro de riesgos y cumplimiento"
         subtitle="Registro de riesgos de IA con scoring, mitigaciones, heatmap por agente y postura de cumplimiento."
         actions={
           <Button variant="secondary" leadingIcon={ShieldWarning} loading={busy === "assess"} disabled={busy !== ""} onClick={() => void assess()}>

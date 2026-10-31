@@ -107,6 +107,7 @@ const AdminOperationsPage = lazy(() => import("./pages/admin/Operations"));
 const AdminSecurityPage = lazy(() => import("./pages/admin/Security"));
 const AdminAuditPage = lazy(() => import("./pages/admin/Audit"));
 const AdminSettingsPage = lazy(() => import("./pages/admin/Settings"));
+const AdminStaffPage = lazy(() => import("./pages/admin/Staff"));
 const AdminFinOpsPage = lazy(() => import("./pages/admin/FinOps"));
 const AdminSystemStatusPage = lazy(() => import("./pages/admin/SystemStatus"));
 const SsoCallbackPage = lazy(() => import("./pages/SsoCallback"));
@@ -559,6 +560,7 @@ export default function App() {
         <Route path="operations" element={<Suspense fallback={<PageFallback />}><AdminOperationsPage /></Suspense>} />
         <Route path="security" element={<Suspense fallback={<PageFallback />}><AdminSecurityPage /></Suspense>} />
         <Route path="audit" element={<Suspense fallback={<PageFallback />}><AdminAuditPage /></Suspense>} />
+        <Route path="staff" element={<Suspense fallback={<PageFallback />}><AdminStaffPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<PageFallback />}><AdminSettingsPage /></Suspense>} />
         <Route path="settings/plans" element={<Suspense fallback={<PageFallback />}><AdminPlansPage /></Suspense>} />
         <Route path="feedback" element={<Suspense fallback={<PageFallback />}><AdminFeedbackPage /></Suspense>} />

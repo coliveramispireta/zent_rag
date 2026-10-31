@@ -419,7 +419,7 @@ async def platform_login(body: LoginRequest, request: Request):
     user = await user_repo.get_by_email(body.email)
     if (
         user is None
-        or not user.is_platform_admin
+        or not (user.is_platform_admin or user.is_platform_staff)
         or not verify_password(body.password, user.password_hash)
     ):
         await record_auth_failure(email_key, ip_key)
@@ -467,7 +467,9 @@ async def platform_login(body: LoginRequest, request: Request):
     )
 
     platform_roles, _ = await get_platform_roles_for_user(user.id)
-    if not platform_roles:
+    # Solo el superadmin heredado se eleva: el personal interno arranca sin rol
+    # y el superadmin se lo asigna a mano.
+    if not platform_roles and user.is_platform_admin:
         await assign_platform_role(user.id, "super_admin")
 
     await _audit_login(

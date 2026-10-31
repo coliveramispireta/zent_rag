@@ -82,7 +82,7 @@ export default function AdminGovernancePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="AI Governance"
+        title="Gobierno de IA"
         subtitle="Juntas de gobierno en todas las organizaciones: políticas, decisiones y auditoría."
       />
       {error && <ErrorInline>{error}</ErrorInline>}

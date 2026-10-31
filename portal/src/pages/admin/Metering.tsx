@@ -136,7 +136,7 @@ export default function AdminMeteringPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Metering & Rate Limits"
+        title="Medición y límites de tasa"
         subtitle="Contadores en vivo (Redis), reglas por plan con burst y fair-use."
       />
       <ErrorInline message={error} />

@@ -243,7 +243,7 @@ function StoryHarness({
 }
 
 describe("ExecutionStoryView (§30, §31)", () => {
-  it("mueve KNOWLEDGE REPRESENTATION fuera de Historia", async () => {
+  it("mueve REPRESENTACIÓN DEL CONOCIMIENTO fuera de Historia", async () => {
     const user = userEvent.setup();
     const story = buildExecutionStory({
       ...COMPLEX_FLOW,
@@ -259,9 +259,9 @@ describe("ExecutionStoryView (§30, §31)", () => {
       },
     });
     render(<StoryHarness story={story} initialMode="story" />);
-    expect(screen.queryByLabelText("KNOWLEDGE REPRESENTATION")).toBeNull();
+    expect(screen.queryByLabelText("REPRESENTACIÓN DEL CONOCIMIENTO")).toBeNull();
     await user.click(screen.getByRole("tab", { name: "Técnico" }));
-    expect(screen.getByLabelText("KNOWLEDGE REPRESENTATION")).toBeTruthy();
+    expect(screen.getByLabelText("REPRESENTACIÓN DEL CONOCIMIENTO")).toBeTruthy();
     expect(screen.getAllByText("ACTIVE").length).toBeGreaterThan(0);
     expect(screen.getAllByText("DOCUMENT UNDERSTANDING ACTIVE BUT PRODUCTIVE RETRIEVAL IS V1").length).toBeGreaterThan(0);
   });

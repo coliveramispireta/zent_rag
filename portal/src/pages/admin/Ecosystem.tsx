@@ -48,7 +48,7 @@ export default function AdminEcosystemPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Agent Ecosystem"
+        title="Ecosistema de agentes"
         subtitle="Marketplace público: adopción por categoría, ingresos con revenue sharing y top publicadores."
       />
       {error && <ErrorInline>{error}</ErrorInline>}

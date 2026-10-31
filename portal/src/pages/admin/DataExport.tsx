@@ -233,7 +233,7 @@ export default function AdminDataExportPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Data Export & Compliance"
+        title="Exportación de datos y cumplimiento"
         subtitle="Export ZIP con anonimización, auditoría de exportaciones y retención granular."
       />
       <ErrorInline message={error} />
@@ -332,7 +332,7 @@ export default function AdminDataExportPage() {
                     ))}
                   </Select>
                 </Field>
-                <Field label="Scope">
+                <Field label="Alcance">
                   <Select
                     value={form.scope}
                     onChange={(e) => setForm((f) => ({ ...f, scope: e.target.value }))}
@@ -366,7 +366,7 @@ export default function AdminDataExportPage() {
                     <thead>
                       <tr>
                         <th>Fecha</th>
-                        <th>Scope</th>
+                        <th>Alcance</th>
                         <th>Anon.</th>
                         <th>Filas</th>
                         <th className="text-right">Tamaño</th>

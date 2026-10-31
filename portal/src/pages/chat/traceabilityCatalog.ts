@@ -615,7 +615,7 @@ export const GLOSSARY: Record<string, { term: string; short: string; more: strin
   canonical_source: {
     term: "Fuente canónica",
     short: "Identidad estable del documento físico.",
-    more: "Se deriva del archivo original (tenant, base de conocimiento, file id, URI, nombre o hash), no del id generado durante el procesamiento.",
+    more: "Se deriva del archivo original (organización, colección, file id, URI, nombre o hash), no del id generado durante el procesamiento.",
   },
   evidence_id: {
     term: "Evidence ID",

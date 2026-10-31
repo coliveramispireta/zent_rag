@@ -120,7 +120,7 @@ export default function AdminDashboardPage() {
         }
         const nearLimit = (cap.near_limit || []).filter((o) => o.soft_limit_exceeded || o.hard_limit_exceeded);
         if (nearLimit.length > 0) {
-          next.push({ id: "capacity", label: `${nearLimit.length} tenant(s) cerca o sobre el límite.`, to: "/control-center/capacity" });
+          next.push({ id: "capacity", label: `${nearLimit.length} organización(es) cerca o sobre el límite.`, to: "/control-center/capacity" });
         }
         setIssues(next.slice(0, 6));
         setError("");
@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
               size="md"
               label="Clientes"
               value={data.customers}
-              hint="active + trialing"
+              hint="activos + en prueba"
               icon={UsersThree}
             />
             <Metric size="md" label="Agentes activos" value={data.active_agents} icon={Pulse} />
@@ -202,7 +202,7 @@ export default function AdminDashboardPage() {
               size="md"
               label="CSAT"
               value={data.csat_pct != null ? `${data.csat_pct}%` : "—"}
-              hint="feedback up / total"
+              hint="feedback positivos / total"
               icon={Smiley}
             />
             <Metric
@@ -221,7 +221,7 @@ export default function AdminDashboardPage() {
             {evalSummary && (
               <Metric
                 size="md"
-                label="Eval runs"
+                label="Ejecuciones de evaluación"
                 value={evalSummary.run_count}
                 hint={`${evalSummary.organizations.length} orgs · sin texto de casos`}
               />

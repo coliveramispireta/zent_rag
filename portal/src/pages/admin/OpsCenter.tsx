@@ -222,7 +222,7 @@ export default function AdminOpsCenterPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Ops Center"
+        title="Centro de operaciones"
         subtitle="Runbooks por alerta, incidentes con SLA (MTTR/MTTD) y escalamiento automático."
       />
       <ErrorInline message={error} />

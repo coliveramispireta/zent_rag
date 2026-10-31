@@ -408,7 +408,7 @@ export default function GovernancePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Governance Board"
+        title="Panel de gobierno"
         subtitle="Políticas versionadas, decisiones con firmas, auditoría encadenada por hash y reporte ejecutivo."
       />
 

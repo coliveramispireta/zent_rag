@@ -74,6 +74,8 @@ class User:
     email: str | None = None  # Portal login (normalized)
     password_hash: str | None = None  # bcrypt hash; never return to clients
     is_platform_admin: bool = False
+    # Personal de Omnio sin organización (acceso gobernado por pantallas).
+    is_platform_staff: bool = False
     disabled_at: datetime | None = None  # Suspensión (Control Center); None = activo
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 

@@ -195,7 +195,7 @@ export default function AdminPlansPage() {
                       />
                     )}
                     <span className="min-w-0 flex-1 truncate">{p.display_name || p.name}</span>
-                    {p.is_trial && <Badge tone="warn">trial</Badge>}
+                    {p.is_trial && <Badge tone="warn">prueba</Badge>}
                   </button>
                 );
               })}

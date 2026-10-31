@@ -56,7 +56,7 @@ export function TraceV2Technical({ trace }: { trace: TraceV2 }) {
             <Row
               label="Llamadas LLM"
               value={value(trace.execution.fastPath.llmCalls)}
-              help="El fast path responde desde la autoridad determinista: no llama al modelo."
+              help="La ruta rápida responde desde la autoridad determinista: no llama al modelo."
             />
             <Row
               label="Llamadas evitadas"
@@ -77,7 +77,7 @@ export function TraceV2Technical({ trace }: { trace: TraceV2 }) {
             ) : null}
             {trace.execution.fastPath.latencyMs !== null ? (
               <Row
-                label="Latencia del fast path"
+                label="Latencia de la ruta rápida"
                 value={fmtMs(trace.execution.fastPath.latencyMs)}
               />
             ) : null}
@@ -237,7 +237,7 @@ export function TraceV2Technical({ trace }: { trace: TraceV2 }) {
           <Row
             label="Retrieval principal"
             value={value(trace.counts.mainRetrievalHits)}
-            help="Fragmentos del retrieval normal. En fast path puede ser 0 sin que la decisión pierda respaldo."
+            help="Fragmentos del retrieval normal. En la ruta rápida puede ser 0 sin que la decisión pierda respaldo."
           />
         ) : null}
         {trace.citationsSummary.references !== null ? (

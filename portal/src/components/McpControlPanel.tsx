@@ -92,8 +92,8 @@ export default function McpControlPanel() {
           <table className="table">
             <thead>
               <tr>
-                <th>Tool</th>
-                <th>Enabled</th>
+                <th>Herramienta</th>
+                <th>Activa</th>
                 <th>Rol mínimo</th>
                 <th>RPM</th>
               </tr>
@@ -116,7 +116,7 @@ export default function McpControlPanel() {
                       onChange={(e) => patchTool(name, { min_role: e.target.value })}
                     >
                       <option value="admin">admin</option>
-                      <option value="customer">customer</option>
+                      <option value="customer">cliente</option>
                     </select>
                   </td>
                   <td>

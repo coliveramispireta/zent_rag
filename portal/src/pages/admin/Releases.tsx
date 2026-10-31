@@ -92,8 +92,8 @@ export default function AdminReleasesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Agent Releases"
-        subtitle="Canales canary/stable, health-gate y promoción gradual con rollbacks."
+        title="Versiones de agentes"
+        subtitle="Canales canario y estable, gate de salud y promoción gradual con rollbacks."
       />
       <ErrorInline message={error} />
       {loading ? (
@@ -143,11 +143,11 @@ export default function AdminReleasesPage() {
           </Panel>
 
           <MetricGrid cols={4}>
-            <Metric size="md" label="Agentes con releases" value={(dash?.agents.length ?? 0).toLocaleString()} />
-            <Metric size="md" label="Releases totales" value={(dash?.total_releases ?? 0).toLocaleString()} />
+            <Metric size="md" label="Agentes con versiones" value={(dash?.agents.length ?? 0).toLocaleString()} />
+            <Metric size="md" label="Versiones totales" value={(dash?.total_releases ?? 0).toLocaleString()} />
             <Metric
               size="md"
-              label="Canary activos"
+              label="Canarios activos"
               value={canaryActive.length.toLocaleString()}
               tone={canaryActive.length > 0 ? "warn" : "default"}
             />
@@ -170,18 +170,18 @@ export default function AdminReleasesPage() {
                 <EmptyState
                   icon={GitCommit}
                   compact
-                  title="Sin releases"
-                  body="Ningún agente registró releases todavía."
-                  hint="Los releases se crean al publicar una versión de agente."
+                  title="Sin versiones"
+                  body="Ningún agente registró versiones todavía."
+                  hint="Las versiones se crean al publicar un agente."
                 />
               ) : (
                 <table className="table min-w-[880px]">
                   <thead>
                     <tr>
                       <th>Agente</th>
-                      <th>Canary</th>
-                      <th>Stable</th>
-                      <th className="text-right">Releases</th>
+                      <th>Canario</th>
+                      <th>Estable</th>
+                      <th className="text-right">Versiones</th>
                       <th>Último estado</th>
                     </tr>
                   </thead>
@@ -240,7 +240,7 @@ export default function AdminReleasesPage() {
                 <EmptyState
                   icon={GitCommit}
                   compact
-                  title="Sin releases"
+                  title="Sin versiones"
                   body="Todavía no se publicó ninguna versión de agente."
                 />
               ) : (
@@ -251,7 +251,7 @@ export default function AdminReleasesPage() {
                       <th>Versión</th>
                       <th>Canal</th>
                       <th className="text-right">Tráfico</th>
-                      <th className="text-right">Health</th>
+                      <th className="text-right">Salud</th>
                       <th>Estado</th>
                       <th>Promovido</th>
                       <th>Rollback</th>

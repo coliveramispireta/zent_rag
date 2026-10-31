@@ -110,8 +110,8 @@ export default function Audit() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Audit"
-        subtitle="Registro global de acciones de plataforma y tenant."
+        title="Auditoría"
+        subtitle="Registro global de acciones de plataforma y organización."
         actions={
           <Input
             icon={MagnifyingGlass}

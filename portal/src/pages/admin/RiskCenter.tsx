@@ -78,7 +78,7 @@ export default function AdminRiskCenterPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Risk & Compliance"
+        title="Riesgos y cumplimiento"
         subtitle="Riesgos de IA en todas las organizaciones: scoring automático, postura por framework y mitigaciones."
       />
       {error && <ErrorInline>{error}</ErrorInline>}

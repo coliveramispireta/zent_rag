@@ -247,7 +247,7 @@ export default function KeysPage() {
               {scope}
             </span>
           ))}
-          {key.scopes.length === 0 && <span className="text-xs text-faint">Sin scopes</span>}
+          {key.scopes.length === 0 && <span className="text-xs text-faint">Sin permisos</span>}
         </span>
       ),
     },
@@ -379,7 +379,7 @@ export default function KeysPage() {
             rows={keys}
             rowKey={(key) => key.id}
             loading={loading}
-            caption="API keys de la organización"
+            caption="Claves de API de la organización"
             empty={
               <EmptyState
                 icon={KeyIcon}
@@ -424,7 +424,7 @@ export default function KeysPage() {
       <Modal
         open={showCreate}
         onOpenChange={setShowCreate}
-        title="Crear API key"
+        title="Crear clave de API"
         description="Elige el entorno y los scopes mínimos que necesita tu integración."
         size="lg"
         footer={
@@ -505,7 +505,7 @@ export default function KeysPage() {
 
       <ConfirmDialog
         open={pendingAction?.kind === "revoke"}
-        title="Revocar API key"
+        title="Revocar clave de API"
         body={
           <p>
             La clave <strong className="text-text">{pendingAction?.name}</strong> dejará de funcionar
@@ -523,7 +523,7 @@ export default function KeysPage() {
 
       <ConfirmDialog
         open={pendingAction?.kind === "rotate"}
-        title="Rotar API key"
+        title="Rotar clave de API"
         body={
           <p>
             Se revoca <strong className="text-text">{pendingAction?.name}</strong> y se emite una clave

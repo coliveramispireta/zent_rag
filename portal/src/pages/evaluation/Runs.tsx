@@ -309,8 +309,8 @@ export default function EvaluationRunsPage() {
           empty={
             <EmptyState
               icon={Stack}
-              title="Sin runs"
-              body="Importá un dataset y lanzá una evaluación para guardar score, latencia y coste por run."
+              title="Sin ejecuciones"
+              body="Importá un dataset y lanzá una evaluación para guardar score, latencia y coste por ejecución."
               action={
                 <ButtonLink to="/evaluation/datasets" variant="primary">
                   Ir a datasets

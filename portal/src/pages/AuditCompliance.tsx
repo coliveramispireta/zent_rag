@@ -271,7 +271,7 @@ export default function AuditCompliancePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Audit & Compliance"
+        title="Auditoría y cumplimiento"
         subtitle="Reportes de actividad con hash encadenado y controles de cumplimiento por framework."
       />
 

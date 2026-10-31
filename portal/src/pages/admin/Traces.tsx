@@ -281,7 +281,7 @@ export default function AdminTracesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Traces & Spans" subtitle="Trazado distribuido de runs, comparación side-by-side y correlación con billing." />
+      <PageHeader title="Trazas y spans" subtitle="Trazado distribuido de ejecuciones, comparación lado a lado y correlación con facturación." />
       <ErrorInline message={error} />
       {loading ? (
         <div className="flex flex-col gap-3" aria-hidden>
@@ -390,16 +390,16 @@ export default function AdminTracesPage() {
 
           <section className="min-w-0">
             <SectionHeader
-              title="Traces"
+              title="Trazas"
               description={`${traces.length} trazas en la ventana seleccionada.`}
               actions={
                 <>
                   <Select
-                    aria-label="Trace A"
+                    aria-label="Traza A"
                     className="w-52"
                     value={selA}
                     onChange={(e) => setSelA(e.target.value)}
-                    placeholder="Trace A…"
+                    placeholder="Traza A…"
                   >
                     {traces.slice(0, 30).map((t) => (
                       <option key={t.id} value={t.trace_id}>
@@ -408,11 +408,11 @@ export default function AdminTracesPage() {
                     ))}
                   </Select>
                   <Select
-                    aria-label="Trace B"
+                    aria-label="Traza B"
                     className="w-52"
                     value={selB}
                     onChange={(e) => setSelB(e.target.value)}
-                    placeholder="Trace B…"
+                    placeholder="Traza B…"
                   >
                     {traces.slice(0, 30).map((t) => (
                       <option key={t.id} value={t.trace_id}>

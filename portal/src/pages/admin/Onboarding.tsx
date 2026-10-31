@@ -145,7 +145,7 @@ export default function AdminOnboardingPage() {
             {(metrics?.funnel ?? []).length === 0 ? (
               <EmptyState
                 compact
-                title="Sin funnel"
+                title="Sin embudo"
                 body="No hay organizaciones que hayan iniciado el flujo de activación."
               />
             ) : (
@@ -173,7 +173,7 @@ export default function AdminOnboardingPage() {
           <section>
             <SectionHeader
               title="Progreso por organización"
-              description="Paso actual y tiempo a primer valor de cada tenant."
+              description="Paso actual y tiempo a primer valor de cada organización."
               className="mb-3"
             />
             <DataTable

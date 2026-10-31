@@ -195,7 +195,7 @@ export default function AdminMigrationsPage() {
                       ? "La organización elegida no registra migraciones de datos."
                       : "Todavía no se ejecutaron migraciones de datos."
                   }
-                  hint="Las migraciones se crean desde el flujo de importación/exportación de cada tenant."
+                  hint="Las migraciones se crean desde el flujo de importación/exportación de cada organización."
                 />
               ) : (
                 <table className="table min-w-[960px]">

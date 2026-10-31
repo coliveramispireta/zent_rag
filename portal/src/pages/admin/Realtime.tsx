@@ -168,7 +168,7 @@ export default function AdminRealtimePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Real-Time"
+        title="Tiempo real"
         subtitle="Eventos en vivo (SSE), resumen de la ventana y corrección automática."
         actions={
           <Button

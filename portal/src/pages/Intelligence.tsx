@@ -219,7 +219,7 @@ export default function IntelligencePage() {
             />
             <Metric
               size="md"
-              label="Runs hoy"
+              label="Ejecuciones hoy"
               value={fmtNum(stats.runs_today)}
               hint="ejecuciones de automatizaciones"
               icon={Lightning}

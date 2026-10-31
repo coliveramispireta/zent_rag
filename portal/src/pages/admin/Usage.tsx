@@ -210,22 +210,22 @@ export default function AdminUsagePage() {
                 help="(LLM + embeddings + storage + infra) / requests del periodo."
               />
               <Metric
-                label="Coste / customer"
+                label="Coste / cliente"
                 value={ratio(data.economics.cost_per_customer)}
                 size="md"
                 help="Costes del periodo divididos entre clientes con actividad o factura en el recorte FinOps."
               />
               <Metric
-                label="Revenue / request"
+                label="Ingreso / request"
                 value={ratio(data.economics.revenue_per_request)}
                 size="md"
                 help="Revenue cash del periodo dividido entre requests. Sube si hay pocas queries y cobros grandes."
               />
               <Metric
-                label="Margen / customer"
+                label="Margen / cliente"
                 value={ratio(data.economics.margin_per_customer)}
                 size="md"
-                help="Gross profit del periodo por cliente. No es margen de un tenant individual."
+                help="Gross profit del periodo por cliente. No es margen de una organización individual."
               />
             </MetricGrid>
           </section>

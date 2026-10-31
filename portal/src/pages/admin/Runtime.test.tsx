@@ -59,7 +59,7 @@ describe("AI Runtime admin page", () => {
         <AdminRuntimePage />
       </MemoryRouter>,
     );
-    expect(await screen.findByText("AI Runtime")).toBeInTheDocument();
-    expect(await screen.findByText("AI Efficiency Score")).toBeInTheDocument();
+    expect(await screen.findByText("Runtime de IA")).toBeInTheDocument();
+    expect(await screen.findByText("Índice de eficiencia de IA")).toBeInTheDocument();
   });
 });

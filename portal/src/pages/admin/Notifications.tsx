@@ -202,7 +202,7 @@ export default function AdminNotificationsPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Webhooks & Notifications"
+        title="Webhooks y notificaciones"
         subtitle="Entregas con firma HMAC, reintentos con backoff y preferencias multicanal."
       />
       {error && <ErrorInline>{error}</ErrorInline>}

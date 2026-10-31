@@ -629,7 +629,7 @@ export function ArchitectAskZent({
               diseño
             </h3>
             <span className="text-[10px] text-faint">
-              Se guarda con el tenant y sobrevive al cerrar la pestaña
+              Se guarda con la organización y sobrevive al cerrar la pestaña
             </span>
           </div>
           <ol className="max-h-56 space-y-2 overflow-auto pr-1">

@@ -154,82 +154,82 @@ export default function AdminRuntimePage() {
       });
       setLabOut(JSON.stringify(out, null, 2));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Experiment failed");
+      setError(err instanceof Error ? err.message : "Falló el experimento");
     }
   }
 
   const priceCols: Column<Price>[] = [
-    { key: "provider", header: "Provider", render: (row) => row.provider },
-    { key: "model", header: "Model", render: (row) => row.model },
-    { key: "kind", header: "Kind", render: (row) => row.cost_kind },
+    { key: "provider", header: "Proveedor", render: (row) => row.provider },
+    { key: "model", header: "Modelo", render: (row) => row.model },
+    { key: "kind", header: "Tipo", render: (row) => row.cost_kind },
     {
       key: "in",
-      header: "Input / 1k",
+      header: "Entrada / 1k",
       align: "right",
       render: (row) => fmtCurrency(row.input_cost_per_1k),
     },
     {
       key: "out",
-      header: "Output / 1k",
+      header: "Salida / 1k",
       align: "right",
       render: (row) => fmtCurrency(row.output_cost_per_1k),
     },
     {
       key: "req",
-      header: "Per request",
+      header: "Por solicitud",
       align: "right",
       render: (row) => fmtCurrency(row.request_cost || 0),
     },
   ];
 
   const capCols: Column<Cap>[] = [
-    { key: "id", header: "Capability", render: (row) => row.id },
-    { key: "handler", header: "Handler", render: (row) => row.handler || "—" },
-    { key: "risk", header: "Risk", render: (row) => row.risk },
-    { key: "cost", header: "Cost", render: (row) => row.cost_class },
-    { key: "availability", header: "Availability", render: (row) => row.availability },
+    { key: "id", header: "Capacidad", render: (row) => row.id },
+    { key: "handler", header: "Manejador", render: (row) => row.handler || "—" },
+    { key: "risk", header: "Riesgo", render: (row) => row.risk },
+    { key: "cost", header: "Costo", render: (row) => row.cost_class },
+    { key: "availability", header: "Disponibilidad", render: (row) => row.availability },
   ];
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="AI Runtime"
-        subtitle="Knowledge, Agents, Tools y Workflows son capabilities del mismo runtime. JEV decide; el Orchestrator ejecuta."
+        title="Runtime de IA"
+        subtitle="Conocimiento, agentes, herramientas y flujos de trabajo son capacidades del mismo runtime. JEV decide; el orquestador ejecuta."
       />
       {error ? <ErrorInline message={error} /> : null}
       {loading ? <SkeletonBlock rows={5} /> : null}
       <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="providers">Providers</TabsTrigger>
-          <TabsTrigger value="capabilities">Capabilities</TabsTrigger>
-          <TabsTrigger value="lab">Experiment Lab</TabsTrigger>
+          <TabsTrigger value="overview">Resumen</TabsTrigger>
+          <TabsTrigger value="providers">Proveedores</TabsTrigger>
+          <TabsTrigger value="capabilities">Capacidades</TabsTrigger>
+          <TabsTrigger value="lab">Laboratorio de experimentos</TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
           {dash ? (
             <div className="flex flex-col gap-4">
               <MetricGrid>
-                <Metric label="Requests today" value={fmtNum(dash.usage.requests)} />
-                <Metric label="Decisions" value={fmtNum(dash.decisions.decisions_today)} />
+                <Metric label="Solicitudes de hoy" value={fmtNum(dash.usage.requests)} />
+                <Metric label="Decisiones" value={fmtNum(dash.decisions.decisions_today)} />
                 <Metric label="JEV %" value={`${dash.decisions.jev_pct}%`} />
-                <Metric label="Rules %" value={`${dash.decisions.rules_pct}%`} />
-                <Metric label="Small LLM %" value={`${dash.decisions.small_llm_pct}%`} />
-                <Metric label="Large LLM %" value={`${dash.decisions.reasoning_llm_pct}%`} />
-                <Metric label="Avg cost / request" value={fmtCurrency(dash.usage.average_cost)} />
+                <Metric label="Reglas %" value={`${dash.decisions.rules_pct}%`} />
+                <Metric label="LLM pequeño %" value={`${dash.decisions.small_llm_pct}%`} />
+                <Metric label="LLM grande %" value={`${dash.decisions.reasoning_llm_pct}%`} />
+                <Metric label="Costo promedio por solicitud" value={fmtCurrency(dash.usage.average_cost)} />
                 <Metric
-                  label="Weighted cost / request"
+                  label="Costo ponderado por solicitud"
                   value={fmtCurrency(dash.usage.weighted_average_cost)}
                 />
                 <Metric label="Tokens" value={fmtNum(dash.usage.tokens)} />
-                <Metric label="Provider cost" value={fmtCurrency(dash.usage.cost)} />
+                <Metric label="Costo del proveedor" value={fmtCurrency(dash.usage.cost)} />
                 <Metric
-                  label="LLM calls avoided (est.)"
+                  label="Llamadas LLM evitadas (est.)"
                   value={fmtNum(dash.llm_calls_avoided_estimate)}
                 />
-                <Metric label="AI Efficiency Score" value={dash.efficiency.score.toFixed(3)} />
+                <Metric label="Índice de eficiencia de IA" value={dash.efficiency.score.toFixed(3)} />
               </MetricGrid>
               <Panel>
-                <PanelHeader title="Efficiency components" />
+                <PanelHeader title="Componentes de eficiencia" />
                 <p className="mb-3 text-[12px] text-muted">{dash.efficiency.formula}</p>
                 <div className="grid gap-3 sm:grid-cols-4">
                   {(["quality", "cost", "latency", "fallback"] as const).map((key) => (
@@ -237,14 +237,14 @@ export default function AdminRuntimePage() {
                       <div className="text-xs text-muted">{key}</div>
                       <div>{dash.efficiency.components[key].toFixed(3)}</div>
                       <div className="text-xs text-faint">
-                        weight {dash.efficiency.weights[key].toFixed(2)}
+                        peso {dash.efficiency.weights[key].toFixed(2)}
                       </div>
                     </div>
                   ))}
                 </div>
               </Panel>
               <Panel>
-                <PanelHeader title="Flags" />
+                <PanelHeader title="Banderas" />
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(dash.flags).map(([key, value]) => (
                     <Badge key={key} tone="neutral">
@@ -254,12 +254,13 @@ export default function AdminRuntimePage() {
                 </div>
               </Panel>
               <Panel>
-                <PanelHeader title="Trace shape" />
+                <PanelHeader title="Forma del trace" />
                 <p className="text-[13px] leading-relaxed text-muted">
-                  User → JEV Decision → Knowledge Search → Evidence Gate → Response. El chat ejecuta
-                  knowledge y SQL; agentes, workflows y tools corren con target explícito
-                  (agent_id / workflow_id / tool) vía CapabilityDispatcher. Cada paso registra
-                  duration, tokens, cost, confidence y status en decision_traces y rag_trace.
+                  Usuario → Decisión JEV → Búsqueda de conocimiento → Gate de evidencia → Respuesta.
+                  El chat ejecuta conocimiento y SQL; agentes, flujos de trabajo y herramientas
+                  corren con objetivo explícito (agent_id / workflow_id / tool) vía
+                  CapabilityDispatcher. Cada paso registra duración, tokens, costo, confianza y
+                  estado en decision_traces y rag_trace.
                 </p>
               </Panel>
             </div>
@@ -267,51 +268,51 @@ export default function AdminRuntimePage() {
         </TabsContent>
         <TabsContent value="providers">
           <Panel>
-            <PanelHeader title="Provider costs" />
+            <PanelHeader title="Costos por proveedor" />
               <DataTable
                 columns={priceCols}
                 rows={prices}
                 rowKey={(row) => `${row.provider}:${row.model}`}
-                empty={<EmptyState title="Sin precios" body="El registry de pricing_models está vacío." />}
+                empty={<EmptyState title="Sin precios" body="El registro de pricing_models está vacío." />}
               />
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <Field label="Provider">
+              <Field label="Proveedor">
                 <Input
                   value={String(edit.provider || "")}
                   onChange={(e) => setEdit({ ...edit, provider: e.target.value })}
                 />
               </Field>
-              <Field label="Model">
+              <Field label="Modelo">
                 <Input
                   value={String(edit.model || "")}
                   onChange={(e) => setEdit({ ...edit, model: e.target.value })}
                 />
               </Field>
-              <Field label="Kind">
+              <Field label="Tipo">
                 <Select
                   value={String(edit.cost_kind || "provider")}
                   onChange={(e) => setEdit({ ...edit, cost_kind: e.target.value })}
                 >
-                  <option value="provider">provider</option>
-                  <option value="internal">internal</option>
-                  <option value="customer">customer</option>
+                  <option value="provider">proveedor</option>
+                  <option value="internal">interno</option>
+                  <option value="customer">cliente</option>
                 </Select>
               </Field>
-              <Field label="Input / 1k">
+              <Field label="Entrada / 1k">
                 <Input
                   type="number"
                   value={String(edit.input_cost_per_1k ?? 0)}
                   onChange={(e) => setEdit({ ...edit, input_cost_per_1k: Number(e.target.value) })}
                 />
               </Field>
-              <Field label="Output / 1k">
+              <Field label="Salida / 1k">
                 <Input
                   type="number"
                   value={String(edit.output_cost_per_1k ?? 0)}
                   onChange={(e) => setEdit({ ...edit, output_cost_per_1k: Number(e.target.value) })}
                 />
               </Field>
-              <Field label="Per request">
+              <Field label="Por solicitud">
                 <Input
                   type="number"
                   value={String(edit.request_cost ?? 0)}
@@ -326,21 +327,21 @@ export default function AdminRuntimePage() {
         </TabsContent>
         <TabsContent value="capabilities">
           <Panel>
-            <PanelHeader title="Capability registry" />
+            <PanelHeader title="Registro de capacidades" />
               <DataTable
                 columns={capCols}
                 rows={caps}
                 rowKey={(row) => row.id}
-                empty={<EmptyState title="Sin capabilities" body="El catálogo no devolvió specs." />}
+                empty={<EmptyState title="Sin capacidades" body="El catálogo no devolvió especificaciones." />}
               />
           </Panel>
         </TabsContent>
         <TabsContent value="lab">
           <Panel>
-            <PanelHeader title="Experiment Lab" />
+            <PanelHeader title="Laboratorio de experimentos" />
             <p className="mb-3 text-[13px] text-muted">
-              Compara Rules, JEV, Novita small y reasoning LLM sobre un dataset. No es tráfico de
-              producción.
+              Compara reglas, JEV, LLM pequeño y LLM de razonamiento sobre un dataset. No es tráfico
+              de producción.
             </p>
             <Textarea rows={8} value={labInput} onChange={(e) => setLabInput(e.target.value)} />
             <Button className="mt-3" onClick={() => void runLab()}>

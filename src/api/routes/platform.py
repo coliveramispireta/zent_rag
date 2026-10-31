@@ -1352,6 +1352,126 @@ async def assign_platform_user_role(
     return {"user_id": str(uid), "role_name": body.role_name, "action": body.action}
 
 
+class ScreenPermissionIn(BaseModel):
+    code: str = Field(..., min_length=1, max_length=60)
+    level: Literal["read", "full"] = "read"
+
+
+class StaffScreensIn(BaseModel):
+    screens: list[ScreenPermissionIn] = Field(default_factory=list)
+
+
+class RoleScreensIn(BaseModel):
+    screens: list[str] = Field(default_factory=list)
+
+
+class StaffCreateIn(BaseModel):
+    email: str = Field(..., min_length=5, max_length=320)
+    password: str = Field(..., min_length=8, max_length=72)
+
+
+@router.get("/screens", summary="Catálogo de pantallas de plataforma")
+async def list_screens_route(request: Request):
+    require_platform_permission(request, "platform.users.manage")
+    from src.platform.rbac.repo import list_screens
+
+    screens = await list_screens()
+    return {"screens": screens, "count": len(screens)}
+
+
+@router.get("/staff", summary="Personal interno con rol y pantallas")
+async def list_staff_route(request: Request):
+    require_platform_permission(request, "platform.users.manage")
+    from src.platform.rbac.repo import list_platform_staff
+
+    staff = await list_platform_staff()
+    return {"staff": staff, "count": len(staff)}
+
+
+@router.post("/staff", summary="Alta de personal interno")
+async def create_staff_route(body: StaffCreateIn, request: Request):
+    ctx = require_platform_permission(request, "platform.users.manage")
+    await _require_step_up(request)
+    from src.platform.rbac.repo import create_staff_user
+
+    email = body.email.strip().lower()
+    if await PostgresUserRepository().get_by_email(email) is not None:
+        raise HTTPException(409, "Email already in use")
+    uid = await create_staff_user(email, body.password)
+    await _audit().write_or_raise(
+        ctx,
+        "platform.staff_created",
+        "platform_user",
+        uid,
+        ip_address=_client_ip(request),
+        metadata={"email": email},
+    )
+    return {"id": str(uid), "email": email, "roles": [], "screens": []}
+
+
+@router.put("/staff/{user_id}/screens", summary="Asignar pantallas y permisos")
+async def set_staff_screens_route(
+    user_id: str, body: StaffScreensIn, request: Request
+):
+    ctx = require_platform_permission(request, "platform.users.manage")
+    from src.platform.rbac.repo import get_staff_user, set_user_screens
+
+    uid = _parse_user(user_id)
+    if await get_staff_user(uid) is None:
+        raise HTTPException(404, "Staff user not found")
+    screens = [item.model_dump() for item in body.screens]
+    await set_user_screens(uid, screens)
+    await _audit().write_or_raise(
+        ctx,
+        "platform.staff_screens_updated",
+        "platform_user",
+        uid,
+        ip_address=_client_ip(request),
+        metadata={"screens": screens},
+    )
+    return {"user_id": str(uid), "screens": screens}
+
+
+@router.get("/role-screens", summary="Pantallas asignadas a cada rol")
+async def role_screens_route(request: Request):
+    require_platform_permission(request, "platform.users.manage")
+    from src.platform.rbac.repo import list_role_screens
+
+    return {"roles": await list_role_screens()}
+
+
+@router.put("/roles/{role_name}/screens", summary="Reemplazar pantallas de un rol")
+async def set_role_screens_route(
+    role_name: str, body: RoleScreensIn, request: Request
+):
+    ctx = require_platform_permission(request, "platform.users.manage")
+    from src.platform.rbac.repo import set_role_screens
+
+    if not await set_role_screens(role_name, body.screens):
+        raise HTTPException(404, "Role not found")
+    await _audit().write_or_raise(
+        ctx,
+        "platform.role_screens_updated",
+        "platform_role",
+        role_name,
+        ip_address=_client_ip(request),
+        metadata={"screens": body.screens},
+    )
+    return {"role": role_name, "screens": body.screens}
+
+
+@router.get("/me/screens", summary="Pantallas efectivas de la sesión actual")
+async def my_screens_route(request: Request):
+    from src.api.security import get_auth_context
+    from src.platform.rbac.repo import get_effective_screens
+
+    ctx = get_auth_context(request)
+    if ctx.auth_type != "platform_session" or ctx.user_id is None:
+        raise HTTPException(403, "Platform session required")
+    screens = await get_effective_screens(ctx.user_id)
+    return {"screens": screens, "count": len(screens)}
+
+
 # ---------------------------------------------------------------------------
 # Control total de usuarios — plataforma y tenant (por usuario)
 # ---------------------------------------------------------------------------

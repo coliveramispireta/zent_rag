@@ -193,8 +193,8 @@ export default function AdminPartnersPage() {
   return (
     <div className="flex flex-col gap-3">
       <PageHeader
-        title="Partner Ecosystem"
-        subtitle="Partners con rev-share, subtenants white-label y catálogo de integraciones."
+        title="Ecosistema de socios"
+        subtitle="Socios con rev-share, suborganizaciones white-label y catálogo de integraciones."
       />
       {error && <ErrorInline message={error} />}
       {notice && <SuccessInline>{notice}</SuccessInline>}
@@ -207,7 +207,7 @@ export default function AdminPartnersPage() {
         <>
           <Panel>
             <PanelHeader
-              title="Nuevo partner"
+              title="Nuevo socio"
               description="Genera un token dedicado; se muestra una sola vez."
             />
             <form
@@ -261,15 +261,15 @@ export default function AdminPartnersPage() {
 
           <section>
             <SectionHeader
-              title="Partners"
-              description="Abre el detalle para ver uso, comisiones y subtenants reales."
+              title="Socios"
+              description="Abre el detalle para ver uso, comisiones y suborganizaciones reales."
               className="mb-3"
             />
             <DataTable
               columns={partnerColumns}
               rows={partners}
               rowKey={(p) => p.id}
-              caption="Partners de la plataforma"
+              caption="Socios de la plataforma"
               stickyHeader
               onRowClick={(p) => openDetail(p)}
               rowActions={(p) => (
@@ -298,8 +298,8 @@ export default function AdminPartnersPage() {
               empty={
                 <EmptyState
                   icon={Handshake}
-                  title="Sin partners"
-                  body="Crea un partner para emitir su token dedicado."
+                  title="Sin socios"
+                  body="Crea un socio para emitir su token dedicado."
                 />
               }
             />
@@ -371,7 +371,7 @@ export default function AdminPartnersPage() {
                   label="Costo 30d"
                   value={fmtCurrency(usage[detail.id].total_cost)}
                 />
-                <Metric size="md" label="Subtenants" value={subtenants[detail.id]?.length ?? 0} />
+                <Metric size="md" label="Suborganizaciones" value={subtenants[detail.id]?.length ?? 0} />
               </MetricGrid>
             )}
 
@@ -398,11 +398,11 @@ export default function AdminPartnersPage() {
             </Panel>
 
             <Panel>
-              <PanelHeader title="Subtenants" description="Organizaciones bajo este partner." />
+              <PanelHeader title="Suborganizaciones" description="Organizaciones bajo este partner." />
               {(subtenants[detail.id] ?? []).length === 0 ? (
                 <EmptyState
                   compact
-                  title="Sin subtenants"
+                  title="Sin suborganizaciones"
                   body="Este partner todavía no tiene organizaciones asociadas."
                 />
               ) : (

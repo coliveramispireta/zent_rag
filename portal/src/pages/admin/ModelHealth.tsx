@@ -423,7 +423,7 @@ export default function AdminModelHealthPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Model Health" subtitle="Budgets con throttling, guardrails de salida y circuit breakers por modelo." />
+      <PageHeader title="Salud de modelos" subtitle="Presupuestos con throttling, guardrails de salida y circuit breakers por modelo." />
       <ErrorInline message={error} />
       {loading ? (
         <div className="flex flex-col gap-3" aria-hidden>
@@ -442,7 +442,7 @@ export default function AdminModelHealthPage() {
             />
             <MetricGrid cols={3} className="lg:grid-cols-3">
               <Metric label="Modelos con tráfico" value={fmtNum(health.length)} size="md" hint={`Ventana ${hours}h`} />
-              <Metric label="Budgets bloqueados" value={fmtNum(blockedBudgets)} size="md" tone={blockedBudgets > 0 ? "warn" : "default"} />
+              <Metric label="Presupuestos bloqueados" value={fmtNum(blockedBudgets)} size="md" tone={blockedBudgets > 0 ? "warn" : "default"} />
               <Metric label="Guardrails activos" value={fmtNum(activeGuardrails)} size="md" />
             </MetricGrid>
           </div>

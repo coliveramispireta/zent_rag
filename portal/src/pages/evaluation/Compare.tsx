@@ -278,7 +278,7 @@ export default function EvaluationComparePage() {
   return (
     <QualityLayout>
       <PageHeader
-        title="Comparar runs"
+        title="Comparar ejecuciones"
         subtitle="Regresión contra un baseline. Veredictos del compare existente: pass / warn / fail."
       />
 
@@ -287,7 +287,7 @@ export default function EvaluationComparePage() {
 
         <Panel>
           <form className="grid gap-4 p-4 sm:grid-cols-2" onSubmit={onCompare}>
-            <Field label="Run actual" required>
+            <Field label="Ejecución actual" required>
               <Select
                 id="cmp-current"
                 value={currentId}

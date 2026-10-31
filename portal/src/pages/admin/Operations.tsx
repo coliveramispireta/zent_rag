@@ -70,8 +70,8 @@ export default function Operations() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Operations"
-        subtitle="Jobs de ingestión y errores de toda la plataforma."
+        title="Operaciones"
+        subtitle="Trabajos de ingesta y errores de toda la plataforma."
       />
       <ErrorInline message={error} />
       {loading ? (
@@ -85,7 +85,7 @@ export default function Operations() {
             compact
             title="Sin jobs"
             body="No hay jobs de ingestión recientes en la plataforma."
-            hint="Los jobs aparecen acá cuando un tenant carga o reprocesa conocimiento."
+            hint="Los jobs aparecen acá cuando una organización carga o reprocesa conocimiento."
           />
         </Panel>
       ) : (
@@ -128,7 +128,7 @@ export default function Operations() {
               <table className="table min-w-[880px]">
                 <thead>
                   <tr>
-                    <th>Tenant</th>
+                    <th>Organización</th>
                     <th>Tipo</th>
                     <th>Estado</th>
                     <th className="w-40">Progreso</th>
@@ -203,7 +203,7 @@ export default function Operations() {
             <KeyValue
               columns={2}
               items={[
-                { key: "Tenant", value: detail.organization_name },
+                { key: "Organización", value: detail.organization_name },
                 { key: "Tipo", value: detail.job_type, mono: true },
                 { key: "Progreso", value: `${detail.progress ?? 0}%` },
                 { key: "Intentos", value: String(detail.attempts) },
@@ -230,7 +230,7 @@ export default function Operations() {
               )}
             </div>
             <ButtonLink variant="secondary" size="sm" to={`/control-center/tenants/${detail.organization_id}`}>
-              Ver tenant
+              Ver organización
             </ButtonLink>
           </div>
         )}

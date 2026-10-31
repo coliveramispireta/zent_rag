@@ -276,7 +276,7 @@ export default function AdminFinOpsPage() {
     ? [
         { title: "Por provider", rows: breakdown.by_provider ?? [] },
         { title: "Por modelo", rows: breakdown.by_model ?? [] },
-        { title: "Por tenant / workspace", rows: breakdown.by_workspace ?? [] },
+        { title: "Por organización / workspace", rows: breakdown.by_workspace ?? [] },
         { title: "Por agente", rows: breakdown.by_agent ?? [] },
         { title: "Por deployment", rows: breakdown.by_deployment ?? [] },
       ]
@@ -299,8 +299,8 @@ export default function AdminFinOpsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="AI Costs (FinOps)"
-        subtitle="Revenue, costos, margen y desglose por dimensión. Las alertas detectan budget, margen negativo y spikes."
+        title="Costos de IA (FinOps)"
+        subtitle="Ingresos, costos, margen y desglose por dimensión. Las alertas detectan presupuesto excedido, margen negativo y picos de consumo."
         actions={
           <Button variant="primary" leadingIcon={Gauge} onClick={() => void runChecks()}>
             Ejecutar checks
@@ -347,7 +347,7 @@ export default function AdminFinOpsPage() {
                       ? "Todavía no hay revenue ni costos suficientes para calcular el margen."
                       : summary.gross_margin_pct < 0
                         ? "Los costos de AI superan los ingresos del período. Revisa el desglose antes de ampliar cuota."
-                        : `Revenue ${usdCents(summary.revenue_cents)} contra AI cost ${usd(aiCostValue ?? 0, 2)}.`}
+                        : `Ingresos ${usdCents(summary.revenue_cents)} contra costo de IA ${usd(aiCostValue ?? 0, 2)}.`}
                   </p>
                 </div>
                 <div className="min-w-[220px] flex-1 sm:max-w-sm">
@@ -355,7 +355,7 @@ export default function AdminFinOpsPage() {
                     <Progress
                       value={aiSharePct}
                       tone={shareTone === "danger" ? "danger" : shareTone === "warn" ? "warn" : "ok"}
-                      label="AI cost sobre revenue"
+                      label="Costo de IA sobre ingresos"
                       showValue
                     />
                   ) : (
@@ -386,7 +386,7 @@ export default function AdminFinOpsPage() {
                   <>
                     <Metric size="md" label="Revenue (cash)" value={usdCents(summary.revenue_cents)} />
                     <Metric size="md" label="MRR" value={usdCents(summary.mrr_cents)} />
-                    <Metric size="md" label="AI cost" value={usd(aiCostValue ?? 0, 2)} />
+                    <Metric size="md" label="Costo de IA" value={usd(aiCostValue ?? 0, 2)} />
                     <Metric
                       size="md"
                       label="Gross profit"
@@ -406,12 +406,12 @@ export default function AdminFinOpsPage() {
                 <Metric size="md" label="Requests" value={economics.requests.toLocaleString()} />
                 <Metric
                   size="md"
-                  label="Cost/request"
+                  label="Costo por solicitud"
                   value={economics.cost_per_request != null ? usd(economics.cost_per_request, 6) : "—"}
                 />
                 <Metric
                   size="md"
-                  label="Cost/customer"
+                  label="Costo por cliente"
                   value={
                     summary?.economics?.cost_per_customer != null
                       ? usd(summary.economics.cost_per_customer, 4)

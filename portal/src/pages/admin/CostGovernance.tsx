@@ -172,7 +172,7 @@ export default function AdminCostGovernancePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Cost Governance & FinOps"
+        title="Gobierno de costos (FinOps)"
         subtitle="Costos por unidad de negocio, alertas adaptativas, showback por equipo y forecast."
       />
       <ErrorInline message={error} />

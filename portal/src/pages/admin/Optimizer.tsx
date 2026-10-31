@@ -155,7 +155,7 @@ export default function AdminOptimizerPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Optimizer"
+        title="Optimizador"
         subtitle="Perfiles de costo/desempeño y recomendaciones accionables por agente."
         actions={
           <Button variant="primary" leadingIcon={Rocket} loading={busy === "scan"} onClick={() => void scan()}>
@@ -226,7 +226,7 @@ export default function AdminOptimizerPage() {
                       <th className="text-right">p50</th>
                       <th className="text-right">p95</th>
                       <th className="text-right">Tokens/req</th>
-                      <th className="text-right">Cost/req</th>
+                      <th className="text-right">Costo/req</th>
                       <th className="text-right">Embedding</th>
                       <th className="text-right">Fuentes/req</th>
                     </tr>

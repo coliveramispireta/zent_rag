@@ -148,7 +148,7 @@ export default function AdminWorkflowsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Workflow Automation" subtitle="Automatizaciones en todas las organizaciones: éxito, duración y fallos por paso." />
+      <PageHeader title="Automatización de flujos" subtitle="Automatizaciones en todas las organizaciones: éxito, duración y fallos por paso." />
       <ErrorInline message={error} />
       {loading ? (
         <div className="flex flex-col gap-3" aria-hidden>
@@ -166,10 +166,10 @@ export default function AdminWorkflowsPage() {
               tone={failed > 0 ? "warn" : "default"}
             />
             <MetricGrid cols={4} className="lg:grid-cols-4">
-              <Metric label="Runs totales" value={total.toLocaleString()} size="md" />
+              <Metric label="Ejecuciones totales" value={total.toLocaleString()} size="md" />
               <Metric label="Fallidos" value={failed.toLocaleString()} size="md" tone={failed > 0 ? "danger" : "default"} />
               <Metric label="Duración media" value={`${dash?.avg_duration_ms ?? 0}ms`} size="md" />
-              <Metric label="Workflows activos" value={(dash?.active_workflows ?? 0).toLocaleString()} size="md" />
+              <Metric label="Flujos activos" value={(dash?.active_workflows ?? 0).toLocaleString()} size="md" />
             </MetricGrid>
           </div>
 
@@ -184,7 +184,7 @@ export default function AdminWorkflowsPage() {
                 sort={sort}
                 onSortChange={setSort}
                 empty={
-                  <EmptyState compact icon={FlowArrow} title="Sin runs" body="Los workflows ejecutados en el periodo se agruparán acá." />
+                  <EmptyState compact icon={FlowArrow} title="Sin ejecuciones" body="Los workflows ejecutados en el periodo se agruparán acá." />
                 }
               />
               <div className="mt-6">
@@ -234,7 +234,7 @@ export default function AdminWorkflowsPage() {
                 rows={recentRuns}
                 rowKey={(row) => `${row.workflow}-${row.started_at}`}
                 empty={
-                  <EmptyState compact icon={FlowArrow} title="Sin runs" body="Cuando se ejecute un workflow verás su estado acá." />
+                  <EmptyState compact icon={FlowArrow} title="Sin ejecuciones" body="Cuando se ejecute un workflow verás su estado acá." />
                 }
               />
             </section>

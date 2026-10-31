@@ -117,7 +117,7 @@ afterEach(() => {
   window.localStorage.clear();
 });
 
-describe("Tenant 360 (CustomerDetail)", () => {
+describe("Organización 360 (CustomerDetail)", () => {
   it("muestra el header con plan, health y métricas", async () => {
     await renderDetail();
     expect(screen.getByText(/Plan: pro/)).toBeInTheDocument();
@@ -131,7 +131,7 @@ describe("Tenant 360 (CustomerDetail)", () => {
     await user.click(screen.getByRole("button", { name: /More actions/ }));
     await user.click(screen.getByRole("menuitem", { name: /Suspend/ }));
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
-    expect(screen.getByText(/Esta acción afecta al tenant/)).toBeInTheDocument();
+    expect(screen.getByText(/Esta acción afecta a la organización/)).toBeInTheDocument();
   });
 
   it("impersonate pide confirmación, motivo y está marcado como privilegiado", async () => {
@@ -151,13 +151,13 @@ describe("Tenant 360 (CustomerDetail)", () => {
     );
   });
 
-  it("muestra el timeline del tenant con datos reales", async () => {
+  it("muestra el timeline de la organización con datos reales", async () => {
     const { user } = await renderDetail();
     await user.click(screen.getByRole("tab", { name: "Timeline" }));
-    await waitFor(() => expect(screen.getByText("Timeline del tenant")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Timeline de la organización")).toBeInTheDocument());
   });
 
-  it("lista usuarios del tenant con acciones por fila", async () => {
+  it("lista usuarios de la organización con acciones por fila", async () => {
     const { user } = await renderDetail();
     await user.click(screen.getByRole("tab", { name: "Users" }));
     expect(await screen.findByText("alice@acme.cl")).toBeInTheDocument();
@@ -166,7 +166,7 @@ describe("Tenant 360 (CustomerDetail)", () => {
     expect(actions.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("suspende un usuario del tenant desde la tabla", async () => {
+  it("suspende un usuario de la organización desde la tabla", async () => {
     const { user, fetchMock } = await renderDetail();
     await user.click(screen.getByRole("tab", { name: "Users" }));
     await user.click((await screen.findAllByRole("button", { name: "Acciones" }))[0]);
@@ -182,7 +182,7 @@ describe("Tenant 360 (CustomerDetail)", () => {
     });
   });
 
-  it("impersona a un usuario concreto del tenant", async () => {
+  it("impersona a un usuario concreto de la organización", async () => {
     const { user, fetchMock } = await renderDetail();
     await user.click(screen.getByRole("tab", { name: "Users" }));
     await user.click((await screen.findAllByRole("button", { name: "Acciones" }))[0]);

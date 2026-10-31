@@ -653,9 +653,9 @@ export default function WorkflowStudioPage() {
   if (isNew) {
     return (
       <div>
-        <Breadcrumb items={[{ label: "Workflows", to: "/workflows" }, { label: "Nuevo workflow" }]} />
+        <Breadcrumb items={[{ label: "Flujos de trabajo", to: "/workflows" }, { label: "Nuevo flujo de trabajo" }]} />
         <PageHeader
-          title="Nuevo workflow"
+          title="Nuevo flujo de trabajo"
           subtitle="Ponle nombre: el lienzo se abre con el trigger listo para conectar nodos."
         />
         <ErrorInline message={error} className="mb-4" />
@@ -701,7 +701,7 @@ export default function WorkflowStudioPage() {
     <div className="flex h-[calc(100dvh-5.5rem)] min-h-[34rem] min-w-0 flex-col gap-2 lg:h-[calc(100dvh-1.5rem)]">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border pb-3">
         <IconButton
-          label="Volver a workflows"
+          label="Volver a flujos de trabajo"
           icon={ArrowLeft}
           className="shrink-0"
           onClick={back}

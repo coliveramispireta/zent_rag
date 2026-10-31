@@ -261,7 +261,7 @@ export default function AdminTrustSafetyPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Trust & Safety Center"
+        title="Centro de confianza y seguridad"
         subtitle="AUP versionada, moderación de contenido con puntuación e incidentes."
       />
       {error && <ErrorInline>{error}</ErrorInline>}
@@ -385,7 +385,7 @@ export default function AdminTrustSafetyPage() {
                       onChange={(e) => setRuleForm((f) => ({ ...f, min_score: Number(e.target.value) }))}
                     />
                   </Field>
-                  <Field label="Patterns" hint="Separados por coma." className="sm:col-span-2">
+                  <Field label="Patrones" hint="Separados por coma." className="sm:col-span-2">
                     <Textarea
                       rows={2}
                       placeholder='"hackear cuenta, ransomware"'

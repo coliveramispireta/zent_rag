@@ -19,6 +19,8 @@ export type PlatformSession = {
   token: string;
   email: string;
   permissions?: string[];
+  /** Pantallas asignadas al usuario (`screens.code`). Vacío = sin acceso. */
+  screens?: string[];
 };
 
 function loadPlatformSession(): PlatformSession | null {
@@ -71,23 +73,34 @@ export function PlatformAuthProvider({ children }: { children: ReactNode }) {
 
   const refreshPermissions = useCallback(async (token: string) => {
     try {
-      const me = await platformApi<{ permissions?: string[]; email?: string }>(
-        "/api/v1/auth/me",
-        { token }
-      );
-      return { permissions: me.permissions || [], email: me.email };
+      const [me, mine] = await Promise.all([
+        platformApi<{ permissions?: string[]; email?: string }>(
+          "/api/v1/auth/me",
+          { token }
+        ),
+        platformApi<{ screens?: { code: string }[] }>(
+          "/api/v1/platform/me/screens",
+          { token }
+        ),
+      ]);
+      return {
+        permissions: me.permissions || [],
+        email: me.email,
+        screens: (mine.screens || []).map((screen) => screen.code),
+      };
     } catch {
-      return { permissions: [] as string[], email: "" };
+      return { permissions: [] as string[], email: "", screens: [] as string[] };
     }
   }, []);
 
   const saveWithPermissions = useCallback(
     async (raw: { token: string; email: string }) => {
-      const { permissions, email } = await refreshPermissions(raw.token);
+      const { permissions, email, screens } = await refreshPermissions(raw.token);
       const next: PlatformSession = {
         token: raw.token,
         email: email || raw.email,
         permissions,
+        screens,
       };
       savePlatformSession(next);
       setSession(next);
@@ -99,11 +112,12 @@ export function PlatformAuthProvider({ children }: { children: ReactNode }) {
     const current = loadPlatformSession();
     if (!current) return;
     void refreshPermissions(current.token).then((info) => {
-      if (!info.permissions.length && !info.email) return;
+      if (!info.permissions.length && !info.email && !info.screens.length) return;
       const next: PlatformSession = {
         token: current.token,
         email: info.email || current.email,
         permissions: info.permissions,
+        screens: info.screens,
       };
       savePlatformSession(next);
       setSession(next);

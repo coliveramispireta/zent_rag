@@ -63,8 +63,8 @@ export default function KnowledgeWorkspacesPage() {
   return (
     <div>
       <PageHeader
-        title="Knowledge Workspaces"
-        subtitle="Agrupá contratos, manuales, bases de datos y APIs en universos separados. Cada workspace tiene sus propias fuentes, cobertura y conflictos."
+        title="Espacios de trabajo de conocimiento"
+        subtitle="Agrupá contratos, manuales, bases de datos y APIs en universos separados. Cada espacio de trabajo tiene sus propias fuentes, cobertura y conflictos."
         actions={<NewWorkspaceModal session={session} onCreated={load} />}
       />
 

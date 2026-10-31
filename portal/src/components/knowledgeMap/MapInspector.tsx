@@ -287,7 +287,7 @@ export function MapInspector({
               <div className="flex flex-col gap-4">
                 <section>
                   <SectionTitle
-                    title="Knowledge strength"
+                    title="Fortaleza del conocimiento"
                     hint={strength.explanation}
                   />
                   <div className="mt-2 flex items-center gap-3">

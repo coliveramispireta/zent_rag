@@ -334,7 +334,7 @@ export default function AdminCustomersPage() {
         onOpenChange={(open) => {
           if (!open) setPeek(null);
         }}
-        title={peek ? peek.company_name || peek.name : "Tenant"}
+        title={peek ? peek.company_name || peek.name : "Organización"}
         description={peek?.email || undefined}
         width={420}
         footer={

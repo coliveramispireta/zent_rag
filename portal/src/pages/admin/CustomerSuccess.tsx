@@ -144,7 +144,7 @@ export default function AdminCustomerSuccessPage() {
   const onboardingColumns: Column<Onboarding>[] = [
     {
       key: "org",
-      header: "Tenant",
+      header: "Organización",
       render: (o) => <span className="mono text-xs text-muted">{o.organization_id.slice(0, 13)}…</span>,
     },
     {
@@ -183,7 +183,7 @@ export default function AdminCustomerSuccessPage() {
   const reportColumns: Column<ReportSub>[] = [
     {
       key: "org",
-      header: "Tenant",
+      header: "Organización",
       render: (s) => <span className="mono text-xs text-muted">{s.organization_id.slice(0, 8)}…</span>,
     },
     { key: "email", header: "Email", render: (s) => s.email },
@@ -212,8 +212,8 @@ export default function AdminCustomerSuccessPage() {
   return (
     <div className="flex flex-col gap-3">
       <PageHeader
-        title="Customer Success"
-        subtitle="Conversión trial→paid, onboarding por tenant y reportes de uso por email."
+        title="Éxito del cliente"
+        subtitle="Conversión trial→paid, onboarding por organización y reportes de uso por email."
       />
       {error && <ErrorInline>{error}</ErrorInline>}
       <SuccessInline>{notice}</SuccessInline>
@@ -239,7 +239,7 @@ export default function AdminCustomerSuccessPage() {
 
             <MetricGrid cols={3}>
               <Metric size="md" label="Trials" value={conversion?.trials ?? 0} icon={Rocket} />
-              <Metric size="md" label="Paid activos" value={conversion?.paid_active ?? 0} />
+              <Metric size="md" label="De pago activos" value={conversion?.paid_active ?? 0} />
               <Metric size="md" label="Subs totales" value={conversion?.total_subscriptions ?? 0} />
             </MetricGrid>
           </section>
@@ -263,7 +263,7 @@ export default function AdminCustomerSuccessPage() {
 
           <section>
             <SectionHeader
-              title="Onboarding por tenant"
+              title="Onboarding por organización"
               description="Pasos completados del flujo de activación."
               className="mb-3"
             />

@@ -71,7 +71,7 @@ export function KnowledgePulse({
     <section
       className="panel ks-pulse"
       data-testid="knowledge-pulse"
-      aria-label="Knowledge Pulse"
+      aria-label="Pulso del conocimiento"
     >
       <header className="ks-pulse-head">
         <span className="ks-orb" aria-hidden>
@@ -79,7 +79,7 @@ export function KnowledgePulse({
           <span className="ks-orb-core" />
         </span>
         <div className="min-w-0">
-          <p className="eyebrow">Knowledge Pulse</p>
+          <p className="eyebrow">Pulso del conocimiento</p>
           <h3 className="text-h3">
             {active ? "ZENT está aprendiendo" : "ZENT aprendió"}
           </h3>

@@ -176,7 +176,7 @@ export default function WorkflowsPage() {
   return (
     <div>
       <PageHeader
-        title="Workflow Automation"
+        title="Automatización de flujos de trabajo"
         subtitle="Cada automatización dice qué hace, cuándo corre y si está activa. Sin diagramas de por medio."
         actions={
           <>
@@ -393,7 +393,7 @@ export default function WorkflowsPage() {
         onOpenChange={(open) => {
           if (!open) setToDelete(null);
         }}
-        title="Eliminar workflow"
+        title="Eliminar flujo de trabajo"
         body={
           toDelete
             ? `¿Eliminar "${toDelete.name}"? Sus corridas dejarán de ser accesibles.`

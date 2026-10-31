@@ -197,7 +197,7 @@ export default function PlaygroundPage() {
             </Field>
 
             <Field
-              label="API key"
+              label="Clave de API"
               hint="La clave completa no se vuelve a mostrar: el portal firma con tu sesión."
             >
               <Select value={keyId} onChange={(e) => setKeyId(e.target.value)} placeholder="Elige una API key…">

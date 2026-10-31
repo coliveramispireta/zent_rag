@@ -385,7 +385,7 @@ export default function AdminEvalsLabPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Evals Lab"
+        title="Laboratorio de evaluaciones"
         subtitle="Datasets versionados, runs con gate de promo y detección de regresión."
       />
       <ErrorInline message={error} />
@@ -399,15 +399,15 @@ export default function AdminEvalsLabPage() {
         <>
           <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <Metric
-              label="Runs ejecutados"
+              label="Ejecuciones"
               value={fmtNum(runs.length)}
-              hint={completed.length > 0 ? `${passedGate} de ${completed.length} completados pasaron el gate` : "Sin runs completados"}
+              hint={completed.length > 0 ? `${passedGate} de ${completed.length} completados pasaron el gate` : "Sin ejecuciones completadas"}
               icon={Flask}
               tone={regressions > 0 ? "warn" : "default"}
             />
             <MetricGrid cols={3} className="lg:grid-cols-3">
               <Metric label="Datasets" value={fmtNum(datasets.length)} size="md" />
-              <Metric label="Items versionados" value={fmtNum(totalItems)} size="md" hint="Suma de datasets" />
+              <Metric label="Casos versionados" value={fmtNum(totalItems)} size="md" hint="Suma de datasets" />
               <Metric
                 label="Regresiones"
                 value={fmtNum(regressions)}
@@ -420,7 +420,7 @@ export default function AdminEvalsLabPage() {
           <Tabs defaultValue="datasets">
             <TabsList>
               <TabsTrigger value="datasets">Datasets</TabsTrigger>
-              <TabsTrigger value="runs">Runs</TabsTrigger>
+              <TabsTrigger value="runs">Ejecuciones</TabsTrigger>
             </TabsList>
 
             <TabsContent value="datasets">
@@ -648,7 +648,7 @@ export default function AdminEvalsLabPage() {
                   empty={
                     <EmptyState
                       icon={Flask}
-                      title="Sin runs"
+                      title="Sin ejecuciones"
                       body="Crea un dataset con items y ejecutá una evaluación."
                     />
                   }

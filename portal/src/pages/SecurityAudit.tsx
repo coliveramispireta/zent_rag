@@ -782,7 +782,7 @@ function AuthConfigPanel({ session }: { session: ReturnType<typeof useAuth>["ses
               />
             </Field>
             <Field
-              label="Client Secret"
+              label="Secreto de cliente"
               hint={cfg?.client_secret_set ? "Ya hay un secreto guardado: déjalo vacío para conservarlo." : undefined}
             >
               <PasswordInput

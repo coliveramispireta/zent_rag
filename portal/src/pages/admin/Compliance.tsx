@@ -138,7 +138,7 @@ export default function AdminCompliancePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Compliance"
+        title="Cumplimiento"
         subtitle="Estado por control (SOC2 / GDPR / ISO27001) y reportes de auditoría con integridad verificable."
       />
       {error && <ErrorInline>{error}</ErrorInline>}

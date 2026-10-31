@@ -248,8 +248,8 @@ export default function AdminAuditIntelligencePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Audit Intelligence"
-        subtitle="Resumen de auditoría, detección de anomalías y gobernanza de IA."
+        title="Inteligencia de auditoría"
+        subtitle="Resumen de auditoría, detección de anomalías y gobierno de IA."
         actions={
           <Button
             variant="primary"

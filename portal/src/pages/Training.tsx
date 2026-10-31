@@ -195,12 +195,12 @@ export default function Training() {
       <ErrorInline message={error} />
       <Panel className="mb-4">
         <PanelHeader
-          title="Nuevo run"
-          description="El run recorre el pipeline completo sobre la colección elegida."
+          title="Nueva ejecución"
+          description="La ejecución recorre el pipeline completo sobre la colección elegida."
         />
         <form className="panel-body" onSubmit={(e) => void start(e)}>
           <div className="flex flex-wrap items-end gap-3">
-            <Field label="Knowledge base" className="min-w-56 flex-1">
+            <Field label="Colección" className="min-w-56 flex-1">
               <Select
                 value={kbId}
                 onChange={(e) => setKbId(e.target.value)}

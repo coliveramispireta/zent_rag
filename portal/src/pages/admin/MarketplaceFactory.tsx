@@ -349,8 +349,8 @@ export default function MarketplaceFactoryPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Marketplace Factory"
-        subtitle="El Control Center convierte capacidades de plataforma en productos vendibles para los tenants."
+        title="Fábrica de marketplace"
+        subtitle="El Control Center convierte capacidades de plataforma en productos vendibles para las organizaciones."
       />
       {error && <ErrorInline>{error}</ErrorInline>}
       {notice && <SuccessInline message={notice} />}
@@ -377,7 +377,7 @@ export default function MarketplaceFactoryPage() {
               <Metric label="Productos" value={overview.products_total} />
               <Metric label="Publicados" value={overview.products_published} size="md" tone="ok" icon={CheckCircle} />
               <Metric label="Borradores" value={overview.products_drafts} size="md" />
-              <Metric label="Installs de tenants" value={overview.tenant_installations} size="md" />
+              <Metric label="Instalaciones de organizaciones" value={overview.tenant_installations} size="md" />
               <Metric label="Integraciones en catálogo" value={overview.library.integrations} size="md" />
             </MetricGrid>
             <Panel>
@@ -793,7 +793,7 @@ function ProductWizard({
               className="font-mono"
               value={appliesTo}
               onChange={(e) => setAppliesTo(e.target.value)}
-              placeholder="WORKFLOWS, AGENTS"
+              placeholder="Superficies separadas por comas"
             />
           </Field>
           <Field label="Precio (modelo)">
@@ -869,7 +869,7 @@ function ProductWizard({
             </div>
           </div>
           <div>
-            <p className="eyebrow mb-2">Workflow templates</p>
+            <p className="eyebrow mb-2">Plantillas de flujos de trabajo</p>
             <div className="max-h-44 space-y-2 overflow-y-auto rounded-md border border-border bg-raised p-3">
               {(palette?.workflow_templates ?? []).map((w) => (
                 <Checkbox

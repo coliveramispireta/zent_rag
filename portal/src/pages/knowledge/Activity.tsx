@@ -411,7 +411,7 @@ function RunsView() {
       {!loading && runs.length > 0 && (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[380px_1fr]">
           <Panel className="overflow-hidden">
-            <PanelHeader title="Runs" description="Más recientes primero." />
+            <PanelHeader title="Ejecuciones" description="Más recientes primero." />
             <ul className="flex flex-col">
               {runs.map((item) => {
                 const active = item.id === activeRunId;

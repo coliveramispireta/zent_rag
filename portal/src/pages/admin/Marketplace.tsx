@@ -200,8 +200,8 @@ export default function AdminMarketplacePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Agent Marketplace"
-        subtitle="Legacy: publicar agentes, instalar en tenants, reviews y prompt templates. El catálogo unificado vive en Marketplace Factory."
+        title="Marketplace de agentes"
+        subtitle="Legacy: publicar agentes, instalar en organizaciones, reseñas y plantillas de prompt. El catálogo unificado vive en Marketplace Factory."
         actions={
           <Button variant="primary" leadingIcon={Upload} onClick={() => setShowPublish(true)}>
             Publicar
@@ -268,7 +268,7 @@ export default function AdminMarketplacePage() {
                 <EmptyState
                   icon={Download}
                   title="Sin listings"
-                  body="Publica un agente para empezar a distribuirlo entre los tenants."
+                  body="Publica un agente para empezar a distribuirlo entre las organizaciones."
                   hint="El alta crea el listing desde un agente existente."
                 />
               }

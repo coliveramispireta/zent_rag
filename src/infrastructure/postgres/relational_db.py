@@ -276,6 +276,12 @@ async def ensure_platform_admin_schema() -> None:
             )
         )
         await session.execute(
+            text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS "
+                "is_platform_staff BOOLEAN NOT NULL DEFAULT false"
+            )
+        )
+        await session.execute(
             text("ALTER TABLE users ADD COLUMN IF NOT EXISTS disabled_at TIMESTAMPTZ")
         )
         await session.execute(text("ALTER TABLE users ALTER COLUMN organization_id DROP NOT NULL"))
@@ -286,7 +292,11 @@ async def ensure_platform_admin_schema() -> None:
             text(
                 """
                 ALTER TABLE users ADD CONSTRAINT users_platform_admin_org_chk
-                    CHECK (is_platform_admin = true OR organization_id IS NOT NULL)
+                    CHECK (
+                        is_platform_admin = true
+                        OR is_platform_staff = true
+                        OR organization_id IS NOT NULL
+                    )
                 """
             )
         )
@@ -304,7 +314,9 @@ class PostgresUserRepository(UserRepository):
 
     _USER_COLS = (
         "id, organization_id, external_id, email_hash, role, email, password_hash, "
-        "COALESCE(is_platform_admin, false) AS is_platform_admin, disabled_at, created_at"
+        "COALESCE(is_platform_admin, false) AS is_platform_admin, "
+        "COALESCE(is_platform_staff, false) AS is_platform_staff, "
+        "disabled_at, created_at"
     )
 
     @staticmethod
@@ -318,6 +330,7 @@ class PostgresUserRepository(UserRepository):
             email=getattr(row, "email", None),
             password_hash=getattr(row, "password_hash", None),
             is_platform_admin=bool(getattr(row, "is_platform_admin", False)),
+            is_platform_staff=bool(getattr(row, "is_platform_staff", False)),
             disabled_at=getattr(row, "disabled_at", None),
             created_at=row.created_at,
         )

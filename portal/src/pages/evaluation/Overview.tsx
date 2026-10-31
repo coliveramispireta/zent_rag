@@ -212,9 +212,9 @@ export default function EvaluationOverview() {
           <Panel>
             <EmptyState
               icon={Stack}
-              title="Sin runs"
+              title="Sin ejecuciones"
               body="Importá un dataset e iniciá una evaluación para ver métricas por dimensión."
-              hint="Cada run guarda score compuesto, latencia y coste por caso."
+              hint="Cada ejecución guarda score compuesto, latencia y coste por caso."
               action={
                 <ButtonLink to="/evaluation/datasets" variant="primary">
                   Ir a datasets
@@ -293,7 +293,7 @@ export default function EvaluationOverview() {
             <MetricGrid cols={4}>
               <Metric
                 size="md"
-                label="Runs"
+                label="Ejecuciones"
                 value={fmtNum(runs.length)}
                 icon={ChartBar}
                 hint={capped ? "se listan los últimos 100" : undefined}

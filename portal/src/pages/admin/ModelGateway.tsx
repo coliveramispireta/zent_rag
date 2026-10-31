@@ -419,8 +419,8 @@ export default function AdminModelGatewayPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Model Gateway"
-        subtitle="Routing por condiciones, A/B por tráfico, presupuestos por modelo y analytics."
+        title="Gateway de modelos"
+        subtitle="Enrutamiento por condiciones, A/B por tráfico, presupuestos por modelo y analítica."
         actions={
           <>
             <ButtonLink to="/control-center/inference-proxy" variant="secondary">
@@ -441,9 +441,9 @@ export default function AdminModelGatewayPage() {
       ) : (
         <Tabs value={tab} onValueChange={(value) => setTab(value as typeof tab)}>
           <TabsList>
-            <TabsTrigger value="routing">Routing</TabsTrigger>
-            <TabsTrigger value="budgets">Budgets</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="routing">Enrutamiento</TabsTrigger>
+            <TabsTrigger value="budgets">Presupuestos</TabsTrigger>
+            <TabsTrigger value="performance">Rendimiento</TabsTrigger>
             <TabsTrigger value="quality">Costo vs Calidad</TabsTrigger>
           </TabsList>
 
@@ -537,7 +537,7 @@ export default function AdminModelGatewayPage() {
                   <EmptyState
                     icon={ArrowsLeftRight}
                     title="Sin rutas"
-                    body="Crea rutas para A/B entre modelos por tenant."
+                    body="Crea rutas para A/B entre modelos por organización."
                     hint="Sin rutas, el gateway usa el modelo por defecto del agente."
                   />
                 }

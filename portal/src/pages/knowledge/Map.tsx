@@ -297,7 +297,7 @@ export default function KnowledgeMapPage() {
     <KnowledgeLayout>
       <header className="km-header">
         <div className="min-w-0">
-          <p className="eyebrow">Knowledge Map</p>
+          <p className="eyebrow">Mapa de conocimiento</p>
           <h1 className="text-h1">El cerebro de tu empresa, navegable</h1>
           <p className="prose-measure mt-1.5 text-sm leading-relaxed text-muted">
             Explora qué sabe ZENT, cómo está conectado y de dónde salió. Cada

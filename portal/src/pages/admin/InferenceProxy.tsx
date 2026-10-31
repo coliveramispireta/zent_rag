@@ -281,7 +281,7 @@ export default function AdminInferenceProxyPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Inference Proxy" subtitle="Cola por plan, routing por capacidad, logs de inferencia y performance por modelo." />
+      <PageHeader title="Proxy de inferencia" subtitle="Cola por plan, enrutamiento por capacidad, logs de inferencia y rendimiento por modelo." />
       <ErrorInline message={error} />
       {loading ? (
         <div className="flex flex-col gap-3" aria-hidden>

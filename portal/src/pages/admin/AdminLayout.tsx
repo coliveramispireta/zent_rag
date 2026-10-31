@@ -143,16 +143,21 @@ function ControlNav({
   instanceId,
   onNavigate,
   permissions,
+  screens,
 }: {
   collapsed: boolean;
   instanceId: string;
   onNavigate?: () => void;
   permissions?: string[];
+  screens?: string[];
 }) {
   const { pathname } = useLocation();
   const [query, setQuery] = useState("");
   const [collapsedGroups, setCollapsedGroups] = useState<string[]>(readCollapsedGroups);
-  const navGroups = useMemo(() => visiblePlatformNav(permissions), [permissions]);
+  const navGroups = useMemo(
+    () => visiblePlatformNav(permissions, screens ?? []),
+    [permissions, screens],
+  );
 
   useEffect(() => {
     try {
@@ -200,7 +205,7 @@ function ControlNav({
             type="search"
             icon={MagnifyingGlass}
             aria-label="Buscar sección"
-            placeholder="Buscar: costs, operations…"
+            placeholder="Buscar: costos, operaciones…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -213,7 +218,11 @@ function ControlNav({
           collapsed && "px-2"
         )}
       >
-        {q ? (
+        {!q && navGroups.length === 0 ? (
+          <p className="px-2.5 py-2 text-xs leading-relaxed text-muted">
+            Sin pantallas asignadas. Pedile al superadmin que te asigne acceso.
+          </p>
+        ) : q ? (
           flat.length === 0 ? (
             <p className="px-2.5 py-2 text-xs text-muted">Sin coincidencias.</p>
           ) : (
@@ -329,6 +338,7 @@ function AdminSidebar({
         instanceId={instanceId}
         onNavigate={onNavigate}
         permissions={session?.permissions}
+        screens={session?.screens}
       />
 
       <div className={cn("mt-2 border-t border-border py-3", collapsed ? "px-2" : "px-3")}>
@@ -559,7 +569,7 @@ export default function AdminLayout() {
                               className="text-accent hover:underline"
                               to={`${BASE}/tenants/${n.organization_id}`}
                             >
-                              {n.organization_name || "Ver tenant"}
+                              {n.organization_name || "Ver organización"}
                             </Link>
                           )}
                           <span className="text-faint">

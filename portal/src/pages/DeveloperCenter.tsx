@@ -401,7 +401,7 @@ export default function DeveloperCenter() {
                     ))}
                   </Select>
                 </Field>
-                <Field label="API key" hint="Vacío = se usa el token de tu sesión del portal.">
+                <Field label="Clave de API" hint="Vacío = se usa el token de tu sesión del portal.">
                   <PasswordInput
                     value={sandboxKey}
                     onChange={(e) => setSandboxKey(e.target.value)}

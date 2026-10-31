@@ -54,7 +54,7 @@ describe("CognitiveTechnicalCard", () => {
         }}
       />,
     );
-    const budgetRow = screen.getByText("Budget").closest("div");
+    const budgetRow = screen.getByText("Presupuesto").closest("div");
     expect(budgetRow).not.toBeNull();
     expect(within(budgetRow as HTMLElement).getByText("—")).toBeInTheDocument();
   });

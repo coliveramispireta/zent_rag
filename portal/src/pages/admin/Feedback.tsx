@@ -183,7 +183,7 @@ export default function AdminFeedbackPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Sentiment & Feedback" subtitle="CSAT, NPS, causas del feedback negativo y tendencias." />
+      <PageHeader title="Sentimiento y feedback" subtitle="CSAT, NPS, causas del feedback negativo y tendencias." />
       <ErrorInline message={error} />
       {loading ? (
         <div className="flex flex-col gap-3" aria-hidden>

@@ -318,7 +318,7 @@ describe("TraceV2Story", () => {
     const trace = parseTraceabilityV2(raw);
     if (!trace) return;
     render(<TraceV2Story trace={trace} onOpenTechnical={vi.fn()} />);
-    expect(screen.getByText("Fast path determinista")).toBeInTheDocument();
+    expect(screen.getByText("Ruta rápida determinista")).toBeInTheDocument();
     expect(
       screen.getByText("0 llamadas LLM · 2 evitadas · 3500 tokens evitados"),
     ).toBeInTheDocument();

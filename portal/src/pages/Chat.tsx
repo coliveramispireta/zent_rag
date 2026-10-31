@@ -1060,7 +1060,7 @@ function RagTracePanel({ trace }: { trace: Record<string, unknown> }) {
     rows.push({ label: "Grounding", value: String(grounding.score ?? "—") });
   }
   if (trace.llm_skipped) {
-    rows.push({ label: "LLM", value: "omitido (fast path)" });
+    rows.push({ label: "LLM", value: "omitido (ruta rápida)" });
   }
   const jev = trace.jev_decisions && typeof trace.jev_decisions === "object"
     ? Object.keys(trace.jev_decisions as object)

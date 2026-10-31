@@ -125,7 +125,7 @@ export default function PdfViewer({
             </button>
           </div>
         )}
-        <span className="text-[11px] text-faint">Source Viewer · PDF</span>
+        <span className="text-[11px] text-faint">Visor de fuente · PDF</span>
       </div>
 
       {highlight && highlight.page === page && highlight.excerpt && (

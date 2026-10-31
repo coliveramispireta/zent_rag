@@ -142,8 +142,8 @@ export default function AdminCapacityPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Capacity Planning"
-        subtitle="Uso real contra los límites de cada plan, colas de workers y simulación de crecimiento."
+        title="Planificación de capacidad"
+        subtitle="Consumo real contra los límites de cada plan, colas de workers y simulación de crecimiento."
         actions={
           <Button
             variant="secondary"
@@ -197,7 +197,7 @@ export default function AdminCapacityPage() {
                 icon={ChartLineUp}
                 compact
                 tone="accent"
-                title="Sin tenants cerca del límite"
+                title="Sin organizaciones cerca del límite"
                 body={`Ningún plan supera ${SOFT_LIMIT_PCT}% de uso ni proyecta alcanzar el límite en ${NEAR_DAYS} días.`}
               />
             )}
@@ -206,14 +206,14 @@ export default function AdminCapacityPage() {
           <MetricGrid cols={4}>
             <Metric
               size="md"
-              label="Tenants en presión"
+              label="Organizaciones en presión"
               value={nearLimit.length.toLocaleString()}
               tone={nearLimit.length > 0 ? "warn" : "default"}
               hint={`Umbral: ≥${SOFT_LIMIT_PCT}% o ≤${NEAR_DAYS} días`}
             />
             <Metric
               size="md"
-              label="Cola knowledge"
+              label="Cola de conocimiento"
               value={(knowledgeQueue?.depth ?? 0).toLocaleString()}
               tone={(knowledgeQueue?.depth ?? 0) >= QUEUE_DEPTH_ALERT ? "warn" : "default"}
               hint={knowledgeQueue ? `Backend ${knowledgeQueue.backend}` : "Sin lectura"}
@@ -235,8 +235,8 @@ export default function AdminCapacityPage() {
 
           <section>
             <SectionHeader
-              title="Tenants cerca del límite"
-              description={`Se listan los que superan ${SOFT_LIMIT_PCT}% de uso, proyectan ese uso o están a ${NEAR_DAYS} días o menos del límite.`}
+              title="Organizaciones cerca del límite"
+              description={`Se listan las que superan ${SOFT_LIMIT_PCT}% de uso, proyectan ese uso o están a ${NEAR_DAYS} días o menos del límite.`}
               className="mb-3"
             />
             <Panel className="overflow-x-auto">
@@ -244,7 +244,7 @@ export default function AdminCapacityPage() {
                 <EmptyState
                   icon={ChartLineUp}
                   compact
-                  title="Ningún tenant en presión"
+                  title="Ninguna organización en presión"
                   body="No hay organizaciones que cumplan los criterios de alerta de capacidad."
                 />
               ) : (

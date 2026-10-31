@@ -64,7 +64,7 @@ describe("DecisionEngine admin page", () => {
         <DecisionEnginePage />
       </MemoryRouter>
     );
-    expect(await screen.findByText("Decision Engine")).toBeInTheDocument();
+    expect(await screen.findByText("Motor de decisión")).toBeInTheDocument();
     expect(await screen.findByText("legacy")).toBeInTheDocument();
     expect(screen.getByText("rules")).toBeInTheDocument();
   });

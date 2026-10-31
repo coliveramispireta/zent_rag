@@ -140,7 +140,7 @@ export default function ReleasesPage() {
         organizationId: session.organizationId,
         body: JSON.stringify({ agent_id: agentId, ...startForm }),
       });
-      setMsg(`Release ${out.release_id.slice(0, 8)}… iniciado.`);
+      setMsg(`Versión ${out.release_id.slice(0, 8)}… iniciada.`);
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
@@ -230,7 +230,7 @@ export default function ReleasesPage() {
     },
     {
       key: "health",
-      header: "Health",
+      header: "Salud",
       align: "right",
       hideBelow: "md",
       render: (r) => (
@@ -244,7 +244,7 @@ export default function ReleasesPage() {
   return (
     <div>
       <PageHeader
-        title="Versiones & Releases"
+        title="Versiones"
         subtitle="Canales canary/stable, health-gate y diff entre versiones."
       />
       <div className="flex flex-col gap-4">
@@ -255,7 +255,7 @@ export default function ReleasesPage() {
           <div className="space-y-4 lg:sticky lg:top-6">
             <Panel>
               <PanelHeader
-                title="Nuevo release"
+                title="Nueva versión"
                 description="Elige agente, versión y canal; el tráfico define el porcentaje expuesto."
               />
               <div className="panel-body flex flex-col gap-4">
@@ -321,7 +321,7 @@ export default function ReleasesPage() {
                   disabled={!agentId || !startForm.version_id}
                   onClick={() => void start()}
                 >
-                  Iniciar release
+                  Iniciar versión
                 </Button>
               </div>
             </Panel>
@@ -409,13 +409,13 @@ export default function ReleasesPage() {
             columns={columns}
             rows={releases}
             rowKey={(r) => r.id}
-            caption="Releases"
+            caption="Versiones"
             loading={loading}
             empty={
               <EmptyState
                 icon={RocketLaunch}
-                title="Sin releases"
-                body="Iniciá un release para promover una versión con tráfico controlado."
+                title="Sin versiones"
+                body="Iniciá una versión para promoverla con tráfico controlado."
               />
             }
             rowActions={(r) => (
@@ -454,7 +454,7 @@ export default function ReleasesPage() {
         onOpenChange={(open) => {
           if (!open) setDetail(null);
         }}
-        title={detail ? `Release ${detail.id.slice(0, 8)} · v${detail.version_number}` : "Release"}
+        title={detail ? `Versión ${detail.id.slice(0, 8)} · v${detail.version_number}` : "Versión"}
         description={detail ? `${detail.channel} · ${detail.traffic_pct}% de tráfico` : undefined}
         width={520}
       >

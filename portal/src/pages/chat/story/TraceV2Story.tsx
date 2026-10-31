@@ -51,14 +51,14 @@ export function TraceV2Story({
     ...(isFastPath
       ? [
           {
-            label: "Fast path",
+            label: "Ruta rápida",
             value: `0 llamadas LLM${
               fastPath?.llmCallsAvoided ? ` · ${fastPath.llmCallsAvoided} evitadas` : ""
             }${fastPath?.tokensAvoided ? ` · ${fastPath.tokensAvoided} tokens evitados` : ""}`,
             help: "La autoridad determinista resolvió la consulta sin razonamiento, JEV ni generación.",
           },
           ...(fastPath?.latencyMs !== null && fastPath?.latencyMs !== undefined
-            ? [{ label: "Latencia fast path", value: fmtMs(fastPath.latencyMs) }]
+            ? [{ label: "Latencia de la ruta rápida", value: fmtMs(fastPath.latencyMs) }]
             : []),
         ]
       : []),
@@ -80,7 +80,7 @@ export function TraceV2Story({
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-h2 text-text">{headline.title}</h2>
           <Badge tone={headline.tone}>{trace.upgradedFromSchema ? "Trazo histórico" : "Schema v2"}</Badge>
-          {isFastPath ? <Badge tone="ok">Fast path determinista</Badge> : null}
+          {isFastPath ? <Badge tone="ok">Ruta rápida determinista</Badge> : null}
         </div>
         <p className="mt-1 text-[12.5px] text-muted">{headline.detail}</p>
         <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 text-[12px] sm:grid-cols-2">

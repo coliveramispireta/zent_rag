@@ -293,25 +293,25 @@ export default function AdminDecisionEnginePage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Decision Engine"
-        subtitle="Rules first, then JEV System One, then a small LLM. The orchestrator still owns execution, auth, and fallbacks."
+        title="Motor de decisión"
+        subtitle="Reglas primero, luego JEV System One y después un LLM pequeño. El orquestador conserva la ejecución, la autorización y los fallbacks."
       />
       {error ? <ErrorInline message={error} /> : null}
       {loading ? <SkeletonBlock rows={4} /> : null}
       {status ? (
         <Panel>
-          <PanelHeader title="Runtime" />
+          <PanelHeader title="Runtime de decisión" />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <div className="text-xs text-muted">Primary</div>
+              <div className="text-xs text-muted">Proveedor primario</div>
               <div>{status.primary_provider}</div>
             </div>
             <div>
-              <div className="text-xs text-muted">Fallback</div>
+              <div className="text-xs text-muted">Respaldo</div>
               <div>{status.fallback || "—"}</div>
             </div>
             <div>
-              <div className="text-xs text-muted">Mode</div>
+              <div className="text-xs text-muted">Modo</div>
               <Badge tone={status.mode === "legacy" ? "neutral" : "info"}>{status.mode}</Badge>
             </div>
             <div>
@@ -321,85 +321,85 @@ export default function AdminDecisionEnginePage() {
               </Badge>
             </div>
             <div>
-              <div className="text-xs text-muted">Shadow</div>
-              <div>{status.shadow ? "on" : "off"}</div>
+              <div className="text-xs text-muted">Sombra</div>
+              <div>{status.shadow ? "activo" : "inactivo"}</div>
             </div>
             <div>
-              <div className="text-xs text-muted">High / low confidence</div>
+              <div className="text-xs text-muted">Confianza alta / baja</div>
               <div>
                 {status.high_confidence} / {status.low_confidence}
               </div>
             </div>
             <div>
-              <div className="text-xs text-muted">Canary</div>
+              <div className="text-xs text-muted">Canario</div>
               <div>{status.canary_percentage}%</div>
             </div>
             <div>
-              <div className="text-xs text-muted">Rules</div>
-              <div>{status.rules_loaded ? "loaded" : "missing"}</div>
+              <div className="text-xs text-muted">Reglas</div>
+              <div>{status.rules_loaded ? "cargadas" : "faltan"}</div>
             </div>
           </div>
         </Panel>
       ) : null}
       {dash ? (
         <>
-          <SectionHeader title="Today" />
+          <SectionHeader title="Hoy" />
           <MetricGrid>
-            <Metric label="Decisions" value={fmtNum(dash.decisions_today)} />
-            <Metric label="Rules %" value={`${dash.rules_pct}`} />
+            <Metric label="Decisiones" value={fmtNum(dash.decisions_today)} />
+            <Metric label="Reglas %" value={`${dash.rules_pct}`} />
             <Metric label="JEV %" value={`${dash.jev_pct}`} />
-            <Metric label="Small LLM %" value={`${dash.small_llm_pct}`} />
-            <Metric label="Reasoning LLM %" value={`${dash.reasoning_llm_pct}`} />
-            <Metric label="Avg confidence" value={`${dash.average_confidence}`} />
-            <Metric label="Fallback rate" value={`${dash.fallback_rate}`} />
-            <Metric label="Avg latency ms" value={`${dash.average_latency_ms}`} />
-            <Metric label="Est. decision cost" value={`${dash.estimated_savings}`} />
+            <Metric label="LLM pequeño %" value={`${dash.small_llm_pct}`} />
+            <Metric label="LLM de razonamiento %" value={`${dash.reasoning_llm_pct}`} />
+            <Metric label="Confianza promedio" value={`${dash.average_confidence}`} />
+            <Metric label="Tasa de respaldo" value={`${dash.fallback_rate}`} />
+            <Metric label="Latencia promedio (ms)" value={`${dash.average_latency_ms}`} />
+            <Metric label="Costo estimado por decisión" value={`${dash.estimated_savings}`} />
           </MetricGrid>
         </>
       ) : null}
       {adaptive ? (
         <Panel>
-          <PanelHeader title="Adaptive RAG" />
+          <PanelHeader title="RAG adaptativo" />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <div className="text-xs text-muted">Mode</div>
+              <div className="text-xs text-muted">Modo</div>
               <Badge tone={adaptive.mode === "off" ? "neutral" : "info"}>{adaptive.mode}</Badge>
             </div>
             <div>
-              <div className="text-xs text-muted">Canary</div>
+              <div className="text-xs text-muted">Canario</div>
               <div>{adaptive.canary_percentage}%</div>
             </div>
             <div>
-              <div className="text-xs text-muted">Max retrieval attempts</div>
+              <div className="text-xs text-muted">Intentos máximos de búsqueda</div>
               <div>{adaptive.max_retrieval_attempts}</div>
             </div>
             <div>
-              <div className="text-xs text-muted">top_k min / max</div>
+              <div className="text-xs text-muted">top_k mínimo / máximo</div>
               <div>
                 {adaptive.top_k?.min} / {adaptive.top_k?.max}
               </div>
             </div>
             <div>
-              <div className="text-xs text-muted">Fast path</div>
-              <div>{adaptive.fast_path ? "on" : "off"}</div>
+              <div className="text-xs text-muted">Ruta rápida</div>
+              <div>{adaptive.fast_path ? "activa" : "inactiva"}</div>
             </div>
             <div>
-              <div className="text-xs text-muted">Rewrite</div>
-              <div>{adaptive.rewrite ? "on" : "off"}</div>
+              <div className="text-xs text-muted">Reescritura</div>
+              <div>{adaptive.rewrite ? "activa" : "inactiva"}</div>
             </div>
             <div>
-              <div className="text-xs text-muted">JEV evidence</div>
-              <div>{adaptive.jev_evidence ? "on" : "off"}</div>
+              <div className="text-xs text-muted">Evidencia JEV</div>
+              <div>{adaptive.jev_evidence ? "activa" : "inactiva"}</div>
             </div>
             <div>
-              <div className="text-xs text-muted">Policy</div>
+              <div className="text-xs text-muted">Política</div>
               <div>{adaptive.policy_version}</div>
             </div>
           </div>
           <p className="mt-3 text-xs text-muted">
-            Default off. Shadow observa el plan. Canary aplica un porcentaje. Cutover 100% solo
-            con compare_legacy_vs_adaptive sobre el golden set. El RAG Trace vive en cada
-            respuesta (`rag_trace`) y en Chat modo desarrollador.
+            Apagado por defecto. La sombra observa el plan. El canario aplica un porcentaje. El
+            corte al 100 % solo con `compare_legacy_vs_adaptive` sobre el golden set. El trace de
+            RAG vive en cada respuesta (`rag_trace`) y en Chat en modo desarrollador.
           </p>
         </Panel>
       ) : null}
@@ -408,35 +408,35 @@ export default function AdminDecisionEnginePage() {
       ) : null}
       {preflight ? (
         <Panel>
-          <PanelHeader title="JEV Effectiveness (juicio antes del LLM)" />
+          <PanelHeader title="Efectividad de JEV (juicio antes del LLM)" />
           <MetricGrid>
-            <Metric label="Mode" value={preflight.mode ?? "off"} />
+            <Metric label="Modo" value={preflight.mode ?? "off"} />
             <Metric
-              label="Judgments"
+              label="Juicios"
               value={fmtNum(preflight.kpis?.judgments ?? 0)}
             />
             <Metric
-              label="Batched calls"
+              label="Llamadas agrupadas"
               value={fmtNum(preflight.kpis?.batched_calls ?? 0)}
             />
             <Metric
-              label="Questions / call"
+              label="Preguntas por llamada"
               value={(preflight.kpis?.questions_per_call ?? 0).toFixed(2)}
             />
             <Metric
-              label="Avg latency"
+              label="Latencia promedio"
               value={`${Math.round(preflight.kpis?.avg_latency_ms ?? 0)} ms`}
             />
             <Metric
-              label="Escalations avoided"
+              label="Escalaciones evitadas"
               value={fmtNum(preflight.kpis?.llm_escalations_avoided ?? 0)}
             />
             <Metric
-              label="Uncertain judgments"
+              label="Juicios inciertos"
               value={fmtNum(preflight.kpis?.uncertain_critical_judgments ?? 0)}
             />
             <Metric
-              label="Decisions influenced"
+              label="Decisiones influidas"
               value={fmtNum(preflight.kpis?.decisions_influencing ?? 0)}
             />
           </MetricGrid>
@@ -476,10 +476,10 @@ export default function AdminDecisionEnginePage() {
       ) : null}
       {fabric ? (
         <Panel>
-          <PanelHeader title="Target selection (agents · workflows · tools)" />
+          <PanelHeader title="Selección de objetivo (agentes · flujos · herramientas)" />
           <MetricGrid>
-            <Metric label="Mode" value={fabric.mode ?? "off"} />
-            <Metric label="Observations" value={fmtNum(fabric.count ?? 0)} />
+            <Metric label="Modo" value={fabric.mode ?? "off"} />
+            <Metric label="Observaciones" value={fmtNum(fabric.count ?? 0)} />
           </MetricGrid>
           <div className="mt-3 flex flex-col gap-1 text-xs text-muted">
             {(fabric.observations ?? []).slice(-5).reverse().map((item, index) => (
@@ -491,7 +491,7 @@ export default function AdminDecisionEnginePage() {
             ))}
             {(fabric.observations ?? []).length === 0 ? (
               <div>
-                Shadow/on registra elecciones y política. off mantiene el target explícito.
+                La sombra registra elecciones y política. Apagado mantiene el objetivo explícito.
               </div>
             ) : null}
           </div>
@@ -499,7 +499,7 @@ export default function AdminDecisionEnginePage() {
       ) : null}
       {riskPolicy ? (
         <Panel>
-          <PanelHeader title="Risk policy" />
+          <PanelHeader title="Política de riesgo" />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(riskPolicy.levels ?? {}).map(([level, thresholds]) => (
               <div key={level}>
@@ -516,19 +516,19 @@ export default function AdminDecisionEnginePage() {
           </div>
           <p className="mt-3 text-xs text-muted">
             Riesgo máximo auto-seleccionable: {riskPolicy.max_selectable_risk ?? "high"}
-            {riskPolicy.tenant_override ? " · override del tenant activo" : ""}. HIGH/CRITICAL
-            exigen dos señales (choice + action_warranted), nunca max().
+            {riskPolicy.tenant_override ? " · override de la organización activo" : ""}.
+            ALTO/CRÍTICO exigen dos señales (choice + action_warranted), nunca max().
           </p>
         </Panel>
       ) : null}
       {learning ? (
         <Panel>
-          <PanelHeader title="Routing accuracy" />
+          <PanelHeader title="Precisión de enrutamiento" />
           <MetricGrid>
-            <Metric label="Decisions" value={fmtNum(learning.totals?.decisions ?? 0)} />
-            <Metric label="Fallbacks" value={fmtNum(learning.totals?.fallbacks ?? 0)} />
+            <Metric label="Decisiones" value={fmtNum(learning.totals?.decisions ?? 0)} />
+            <Metric label="Respaldos" value={fmtNum(learning.totals?.fallbacks ?? 0)} />
             <Metric
-              label="Accuracy"
+              label="Precisión"
               value={
                 learning.totals?.routing_accuracy == null
                   ? "—"
@@ -550,13 +550,13 @@ export default function AdminDecisionEnginePage() {
       ) : null}
       {calibration ? (
         <Panel>
-          <PanelHeader title="Confidence calibration" />
+          <PanelHeader title="Calibración de confianza" />
           <DataTable
             columns={[
-              { key: "bucket", header: "Bucket", render: (row) => row.bucket ?? "—" },
+              { key: "bucket", header: "Rango", render: (row) => row.bucket ?? "—" },
               {
                 key: "decisions",
-                header: "Decisions",
+                header: "Decisiones",
                 align: "right",
                 render: (row) => fmtNum(row.decisions ?? 0),
               },
@@ -627,18 +627,18 @@ export default function AdminDecisionEnginePage() {
       ) : null}
       {costs ? (
         <Panel>
-          <PanelHeader title="Cost breakdown" />
+          <PanelHeader title="Desglose de costos" />
           <MetricGrid>
             <Metric label="Total" value={`$${(costs.total_cost ?? 0).toFixed(4)}`} />
             <Metric label="JEV" value={`$${(costs.jev_cost ?? 0).toFixed(4)}`} />
             <Metric
-              label="JEV share"
+              label="Participación de JEV"
               value={
                 costs.jev_share == null ? "—" : `${(costs.jev_share * 100).toFixed(1)}%`
               }
             />
             <Metric
-              label="Cost / answer"
+              label="Costo por respuesta"
               value={
                 costs.per_result?.cost_per_successful_answer == null
                   ? "—"
@@ -646,7 +646,7 @@ export default function AdminDecisionEnginePage() {
               }
             />
             <Metric
-              label="Cost / agent run"
+              label="Costo por ejecución de agente"
               value={
                 costs.per_result?.cost_per_agent_run == null
                   ? "—"
@@ -664,7 +664,7 @@ export default function AdminDecisionEnginePage() {
         </Panel>
       ) : null}
       <Panel>
-        <PanelHeader title="Recent decisions" />
+        <PanelHeader title="Decisiones recientes" />
         <DataTable
           columns={columns}
           rows={traces}

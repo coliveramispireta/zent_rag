@@ -13,9 +13,9 @@ import {
 type McpTool = { tool: string; perm: string; desc: string };
 
 const TOOLS: McpTool[] = [
-  { tool: "search_knowledge", perm: "rag:read", desc: "Búsqueda semántica en la knowledge base del tenant (chunks + scores)." },
+  { tool: "search_knowledge", perm: "rag:read", desc: "Búsqueda semántica en la colección de la organización (chunks + scores)." },
   { tool: "query_database", perm: "rag:read", desc: "Pregunta NL → SQL read-only validado (guardas del SQL Expert intactas). SQL solo visible con rol admin." },
-  { tool: "get_document", perm: "rag:read", desc: "Fetch de chunks por document_id (Qdrant) con verificación estricta de tenant." },
+  { tool: "get_document", perm: "rag:read", desc: "Fetch de chunks por document_id (Qdrant) con verificación estricta de la organización." },
   { tool: "execute_agent", perm: "agents:execute", desc: "Ejecuta un agente configurado (ReAct + allowlist de tools + guardrails + quotas)." },
   { tool: "get_usage", perm: "usage:read", desc: "Agregados de uso de la organización (requests, tokens, latencia, costo)." },
 ];
@@ -85,7 +85,7 @@ export default function McpPage() {
             </p>
             <CodeBlock code={ENDPOINT} language="http" filename="POST /mcp" maxHeight={200} className="mt-3" />
             <p className="mt-3 text-xs leading-relaxed text-faint">
-              La identidad (tenant/usuario/permisos) se deriva exclusivamente del token validado por el
+              La identidad (organización/usuario/permisos) se deriva exclusivamente del token validado por el
               TenantMiddleware. La cuota del plan y los rate limits aplican igual que en REST.
             </p>
           </div>

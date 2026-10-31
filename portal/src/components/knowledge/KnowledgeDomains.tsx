@@ -27,7 +27,7 @@ export function KnowledgeDomains({
     <Panel className="overflow-hidden" data-testid="knowledge-domains">
       <div className="panel-header">
         <div className="min-w-0">
-          <h2 className="text-h3">Knowledge Domains</h2>
+          <h2 className="text-h3">Dominios de conocimiento</h2>
           <p className="mt-0.5 text-xs text-muted">
             Áreas que ZENT descubrió y sigue aprendiendo.
           </p>

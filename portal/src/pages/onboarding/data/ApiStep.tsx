@@ -48,7 +48,7 @@ export function ApiStep({
         <select className="input mt-1 w-full" value={auth} onChange={(e) => setAuth(e.target.value)}>
           <option value="none">Ninguna</option>
           <option value="bearer">Bearer Token</option>
-          <option value="api_key">API Key</option>
+          <option value="api_key">Clave de API</option>
           <option value="basic">Basic Auth</option>
         </select>
       </label>

@@ -538,7 +538,7 @@ export default function AdminCustomerDetailPage() {
         setDeleteError(
           out.organization.protected_reason === "own_organization"
             ? "No puedes eliminar tu propia organización."
-            : "La organización tiene un platform admin como miembro; cámbialo de tenant antes de eliminarla."
+            : "La organización tiene un platform admin como miembro; cámbialo de organización antes de eliminarla."
         );
       }
     } catch (err) {
@@ -753,7 +753,7 @@ export default function AdminCustomerDetailPage() {
   if (!data && !error) return <SkeletonBlock />;
 
   const riskyFactors = (health?.factors ?? []).filter((f) => f.status !== "ok");
-  const company = data?.company_name || data?.name || "Tenant";
+  const company = data?.company_name || data?.name || "Organización";
   const principalRank = (u: TenantUser) =>
     u.roles.includes("owner") ? 0 : u.roles.includes("admin") ? 1 : 2;
   const sortedUsers = [...users].sort(
@@ -868,7 +868,7 @@ export default function AdminCustomerDetailPage() {
                 <Metric size="md" label="Usuarios" value={data.users} />
                 <Metric size="md" label="Agentes" value={data.agents} />
                 <Metric size="md" label="Requests 30d" value={data.requests_30d} />
-                <Metric size="md" label="AI cost 30d" value={fmtCurrency(finops?.costs.llm ?? data.ai_cost_30d)} />
+                <Metric size="md" label="Costo de IA 30d" value={fmtCurrency(finops?.costs.llm ?? data.ai_cost_30d)} />
                 <Metric size="md" label="Embeddings" value={fmtCurrency(finops?.costs.embedding ?? 0)} />
                 <Metric
                   size="md"
@@ -885,7 +885,7 @@ export default function AdminCustomerDetailPage() {
               <Panel>
                 <PanelHeader
                   title="Acciones"
-                  description="Operaciones sobre el tenant. Quedan registradas en auditoría."
+                  description="Operaciones sobre la organización. Quedan registradas en auditoría."
                 />
                 <div className="flex flex-wrap items-center gap-2 p-4">
                   <Button
@@ -915,7 +915,7 @@ export default function AdminCustomerDetailPage() {
                     Exportar
                   </Button>
                   <Menu
-                    label="Acciones del tenant"
+                    label="Acciones de la organización"
                     trigger={
                       <Button variant="secondary" trailingIcon={CaretDown} disabled={busy !== ""}>
                         More actions
@@ -949,7 +949,7 @@ export default function AdminCustomerDetailPage() {
 
         <TabsContent value="Timeline">
           <Panel>
-            <PanelHeader title="Timeline del tenant" description="Eventos reales del tenant en orden cronológico inverso." />
+            <PanelHeader title="Timeline de la organización" description="Eventos reales de la organización en orden cronológico inverso." />
             {timelineLoading ? (
               <div className="p-4">
                 <SkeletonBlock rows={5} />
@@ -965,7 +965,7 @@ export default function AdminCustomerDetailPage() {
             columns={userColumns}
             rows={sortedUsers}
             rowKey={(u) => u.id}
-            caption="Usuarios del tenant"
+            caption="Usuarios de la organización"
             stickyHeader
             rowActions={(u) => (
               <Menu
@@ -1025,7 +1025,7 @@ export default function AdminCustomerDetailPage() {
               <EmptyState
                 icon={UsersThree}
                 title="Sin usuarios"
-                body="Este tenant no tiene miembros con acceso."
+                body="Esta organización no tiene miembros con acceso."
               />
             }
           />
@@ -1036,13 +1036,13 @@ export default function AdminCustomerDetailPage() {
             columns={agentColumns}
             rows={agents}
             rowKey={(a) => a.id}
-            caption="Agentes del tenant"
+            caption="Agentes de la organización"
             stickyHeader
             empty={
               <EmptyState
                 icon={Robot}
                 title="Sin agentes"
-                body="Este tenant todavía no creó agentes."
+                body="Esta organización todavía no creó agentes."
               />
             }
           />
@@ -1053,13 +1053,13 @@ export default function AdminCustomerDetailPage() {
             columns={sourceColumns}
             rows={sources}
             rowKey={(s) => s.id}
-            caption="Fuentes de datos del tenant"
+            caption="Fuentes de datos de la organización"
             stickyHeader
             empty={
               <EmptyState
                 icon={Database}
                 title="Sin fuentes"
-                body="Este tenant todavía no conectó fuentes de datos."
+                body="Esta organización todavía no conectó fuentes de datos."
               />
             }
           />
@@ -1084,7 +1084,7 @@ export default function AdminCustomerDetailPage() {
             <Panel>
               <EmptyState
                 title="Sin datos de costos"
-                body="La API de FinOps no devolvió datos para este tenant."
+                body="La API de FinOps no devolvió datos para esta organización."
               />
             </Panel>
           )}
@@ -1113,13 +1113,13 @@ export default function AdminCustomerDetailPage() {
               columns={invoiceColumns}
               rows={billing?.invoices ?? []}
               rowKey={(inv) => inv.id}
-              caption="Facturas del tenant"
+              caption="Facturas de la organización"
               stickyHeader
               empty={
                 <EmptyState
                   icon={Receipt}
                   title="Sin facturas"
-                  body="Este tenant no tiene facturas emitidas."
+                  body="Esta organización no tiene facturas emitidas."
                 />
               }
             />
@@ -1131,13 +1131,13 @@ export default function AdminCustomerDetailPage() {
             columns={keyColumns}
             rows={keys}
             rowKey={(k) => k.id}
-            caption="API keys del tenant"
+            caption="API keys de la organización"
             stickyHeader
             empty={
               <EmptyState
                 icon={Key}
-                title="Sin API keys"
-                body="Este tenant no tiene API keys emitidas."
+                title="Sin claves de API"
+                body="Esta organización no tiene claves de API emitidas."
               />
             }
           />
@@ -1147,13 +1147,13 @@ export default function AdminCustomerDetailPage() {
           <Panel>
             <PanelHeader
               title="Auditoría"
-              description="Eventos registrados para este tenant, más recientes primero."
+              description="Eventos registrados para esta organización, más recientes primero."
             />
             {audit.length === 0 ? (
               <EmptyState
                 icon={ClockCounterClockwise}
                 title="Sin eventos"
-                body="No hay eventos de auditoría para este tenant."
+                body="No hay eventos de auditoría para esta organización."
               />
             ) : (
               <div className="px-4 py-1">
@@ -1169,14 +1169,14 @@ export default function AdminCustomerDetailPage() {
         title={`Confirmar: ${confirmAction || ""}`}
         body={
           <p>
-            Esta acción afecta al tenant{" "}
+            Esta acción afecta a la organización{" "}
             <strong className="text-text">{data?.company_name || data?.name || ""}</strong>.{" "}
             {confirmAction === "cancel"
               ? "Cancelar detiene la suscripción. Se puede revertir manualmente."
               : confirmAction === "reset"
                 ? "Reset de uso reinicia los contadores del período."
                 : confirmAction === "suspend"
-                  ? "Suspend bloqueará requests, logins y deployments del tenant."
+                  ? "Suspender bloqueará solicitudes, inicios de sesión y despliegues de la organización."
                   : "Esta operación es reversible desde la ficha."}
           </p>
         }
@@ -1196,7 +1196,7 @@ export default function AdminCustomerDetailPage() {
         title={
           userAction?.kind === "impersonate"
             ? `Impersonar a ${userAction.user.email || userAction.user.id}`
-            : "Impersonar tenant"
+            : "Impersonar organización"
         }
         body={
           <div className="space-y-3">

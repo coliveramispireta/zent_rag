@@ -363,7 +363,7 @@ export default function KnowledgeWorkspacePage() {
                   <div className="rounded-lg border border-dashed border-zinc-300 p-3 text-[11px] leading-relaxed text-zinc-500">
                     <p className="font-medium text-zinc-600">Este workspace no tiene fuentes.</p>
                     <ol className="mt-1.5 list-decimal space-y-1 pl-4">
-                      <li>Sube un PDF, DOCX o texto en <span className="font-medium text-indigo-600">Knowledge → Fuentes</span>.</li>
+                      <li>Sube un PDF, DOCX o texto en <span className="font-medium text-indigo-600">Conocimiento → Fuentes</span>.</li>
                       <li>Reprocesa la fuente (re-sync) para indexar su estructura.</li>
                       <li>Vuelve aquí: aparecerá y podrás preguntarle.</li>
                     </ol>
@@ -635,7 +635,7 @@ function ViewerPane({
           <FileText size={15} className="text-zinc-400" />
           <h2 className="text-sm font-semibold text-zinc-800">{source.name}</h2>
         </div>
-        <span className="text-[11px] text-zinc-400">Source Viewer</span>
+        <span className="text-[11px] text-zinc-400">Visor de fuente</span>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
         {highlighted && (
@@ -726,7 +726,7 @@ function StudioPane({ corpusId }: { corpusId: string }) {
     <div className="min-h-0 flex-1 overflow-y-auto p-4">
       <div className="flex items-center gap-2">
         <ChatCircleText size={16} className="text-indigo-600" />
-        <h3 className="text-sm font-semibold text-zinc-800">Knowledge Studio</h3>
+        <h3 className="text-sm font-semibold text-zinc-800">Estudio de conocimiento</h3>
       </div>
       <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
         Artefactos generados a partir de datos reales del corpus. Los candidatos

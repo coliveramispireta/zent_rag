@@ -119,8 +119,8 @@ export default function AdminRevenuePage() {
   return (
     <div className="flex flex-col gap-3">
       <PageHeader
-        title="Revenue Intelligence"
-        subtitle="ARR/MRR, expansión/contracción, cohortes trial→paid y forecast."
+        title="Inteligencia de ingresos"
+        subtitle="ARR/MRR, expansión/contracción, cohortes de prueba a pago y forecast."
       />
       {error && <ErrorInline message={error} />}
       {loading ? (
@@ -229,7 +229,7 @@ export default function AdminRevenuePage() {
 
           <section>
             <SectionHeader
-              title="Cohortes trial→paid"
+              title="Cohortes de prueba a pago"
               description="Últimos 12 meses de conversión y retención real."
               className="mb-3"
             />

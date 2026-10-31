@@ -527,7 +527,7 @@ export default function RoleStudioPage() {
                 ) : null}
                 <p className="text-xs text-faint">
                   Autonomía efectiva: {autonomyLabel(draft.autonomy_level)}. La autoridad real
-                  sigue siendo la intersección de usuario, servicio, tenant, políticas y
+                  sigue siendo la intersección de usuario, servicio, organización, políticas y
                   herramienta instalada.
                 </p>
                 {sheet.disclaimer ? (

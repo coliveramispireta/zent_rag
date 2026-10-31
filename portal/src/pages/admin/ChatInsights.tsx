@@ -112,7 +112,7 @@ export default function AdminChatInsightsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Chat Insights" subtitle="Conversaciones en todas las organizaciones: volumen, temas, resolución y escalaciones." />
+      <PageHeader title="Insights de chat" subtitle="Conversaciones en todas las organizaciones: volumen, temas, resolución y escalaciones." />
       <ErrorInline message={error} />
       {loading ? (
         <div className="flex flex-col gap-3" aria-hidden>

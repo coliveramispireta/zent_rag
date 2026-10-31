@@ -197,8 +197,8 @@ export default function AdminTrustPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Trust Center"
-        subtitle="Postura de seguridad, riesgo de IA, compliance y auditoría en una sola vista. Datos reales de los módulos."
+        title="Resumen de confianza"
+        subtitle="Postura de seguridad, riesgo de IA, cumplimiento y auditoría en una sola vista. Datos reales de los módulos."
         actions={
           <>
             <ButtonLink to="/control-center/security-center" variant="secondary" size="sm">
@@ -257,7 +257,7 @@ export default function AdminTrustPage() {
                     </p>
                   </div>
                   <div className="min-w-48 flex-1">
-                    <p className="eyebrow">Compliance</p>
+                    <p className="eyebrow">Cumplimiento</p>
                     <p className="mt-1 text-h2 tabular-nums">
                       {avgCompliance != null ? `${avgCompliance}%` : "—"}
                     </p>

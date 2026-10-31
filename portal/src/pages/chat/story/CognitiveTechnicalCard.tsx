@@ -27,13 +27,13 @@ export function CognitiveTechnicalCard({ raw }: { raw?: Record<string, unknown> 
       <p className="eyebrow mb-2">Runtime cognitivo</p>
       <dl className="grid grid-cols-1 gap-x-4 gap-y-2 text-[12px] sm:grid-cols-2">
         <Row label="Modo" value={String(story.raw.mode ?? "—")} />
-        <Row label="Run" value={String(story.raw.run_id ?? "—")} />
+        <Row label="Ejecución" value={String(story.raw.run_id ?? "—")} />
         <Row label="Estrategia" value={String(strategy.primary ?? "—")} />
         <Row label="Evidencia" value={String(evidence.count ?? 0)} />
         <Row label="Conflictos" value={String(evidence.conflicts ?? 0)} />
         <Row label="Verificación" value={String(verification.action ?? "—")} />
         <Row
-          label="Budget"
+          label="Presupuesto"
           value={
             typeof budget.within_budget === "boolean"
               ? budget.within_budget

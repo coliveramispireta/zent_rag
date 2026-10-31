@@ -59,7 +59,7 @@ export default function OnboardingPage() {
     <div>
       <PageHeader
         title="Onboarding"
-        subtitle={state?.completed ? "¡Tenant activado! 🎉" : "Sigue el checklist para activar tu primer agente."}
+        subtitle={state?.completed ? "¡Organización activada! 🎉" : "Sigue el checklist para activar tu primer agente."}
       />
       {error && <ErrorInline>{error}</ErrorInline>}
       {loading || !state ? (

@@ -122,7 +122,7 @@ async function buildPlatformCommands(
     ...(tenants.organizations || []).map((t) => ({
       id: `tenant-${t.id}`,
       label: t.company_name || t.name,
-      group: "Tenants",
+      group: "Organizaciones",
       to: `/control-center/tenants/${t.id}`,
       icon: SquaresFour,
     })),
@@ -285,7 +285,7 @@ export function CommandPaletteRoot({ mode }: { mode: PaletteMode }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={
-                mode === "platform" ? "Buscar páginas, tenants…" : "Buscar páginas, agentes, fuentes…"
+                mode === "platform" ? "Buscar páginas, organizaciones…" : "Buscar páginas, agentes, fuentes…"
               }
               aria-label="Buscar"
               className="w-full bg-transparent text-sm text-text outline-none placeholder:text-ghost"

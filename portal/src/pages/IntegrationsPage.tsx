@@ -780,7 +780,7 @@ export default function IntegrationsPage() {
           </Field>
 
           {credKind === "api_key" && (
-            <Field label="API Key">
+            <Field label="Clave de API">
               <PasswordInput
                 autoComplete="off"
                 value={credValues.api_key ?? ""}
@@ -975,7 +975,7 @@ function ReviewBody({
             }}
           >
             <option value="none">Sin autenticación</option>
-            <option value="api_key">API Key</option>
+            <option value="api_key">Clave de API</option>
             <option value="bearer">Bearer token</option>
             <option value="basic">Basic Auth</option>
             <option value="oauth2">OAuth2 / token</option>

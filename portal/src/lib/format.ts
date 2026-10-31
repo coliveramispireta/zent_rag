@@ -5,27 +5,27 @@ export function fmtNum(n: number | null | undefined): string {
   return n.toLocaleString(LOCALE);
 }
 
+/** Fecha en `dd/mm/aaaa` (glosario §4). */
 export function fmtDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
   return d.toLocaleDateString(LOCALE, {
     day: "2-digit",
-    month: "short",
+    month: "2-digit",
     year: "numeric",
   });
 }
 
+/** Fecha y hora en `dd/mm/aaaa HH:mm`, 24 h. */
 export function fmtDateTime(iso: string | null | undefined): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString(LOCALE, {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const date = fmtDate(iso);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${date} ${hh}:${mm}`;
 }
 
 /** Formatea una cantidad en dólares (monto, no centavos). */

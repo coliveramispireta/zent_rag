@@ -226,8 +226,8 @@ export default function AdminFederatedAnalyticsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Federated Analytics"
-        subtitle="Métricas multi-tenant agregadas (30d) con drill-down por organización."
+        title="Analítica federada"
+        subtitle="Métricas multiorganización agregadas (30d) con drill-down por organización."
         actions={
           <Button variant="secondary" leadingIcon={Download} onClick={() => void exportCsv()}>
             Export CSV
@@ -268,7 +268,7 @@ export default function AdminFederatedAnalyticsPage() {
                   <MagnifyingGlass size={15} aria-hidden /> Por organización
                 </span>
               }
-              description="Volumen, costo y superficie de cada tenant en el periodo."
+              description="Volumen, costo y superficie de cada organización en el periodo."
               className="mb-3"
             />
             <DataTable

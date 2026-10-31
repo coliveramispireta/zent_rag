@@ -58,13 +58,13 @@ export default function ManagedImportPage() {
     <KnowledgeLayout>
       <PageHeader title={KNOWLEDGE_HEADINGS.importCsv} />
       <ol className="mb-4 list-decimal pl-5 text-sm text-muted">
-        <li>Upload File</li>
-        <li>Detect Columns</li>
-        <li>Infer Types</li>
-        <li>Preview</li>
-        <li>Create New Table or Import Into Existing</li>
-        <li>Semantic Mapping</li>
-        <li>Import</li>
+        <li>Subir archivo</li>
+        <li>Detectar columnas</li>
+        <li>Inferir tipos</li>
+        <li>Vista previa</li>
+        <li>Crear tabla nueva o importar a una existente</li>
+        <li>Mapeo semántico</li>
+        <li>Importar</li>
       </ol>
       <textarea className="input min-h-16" value={headers} onChange={(e) => setHeaders(e.target.value)} />
       <textarea className="input mt-2 min-h-24" value={rowsText} onChange={(e) => setRowsText(e.target.value)} />

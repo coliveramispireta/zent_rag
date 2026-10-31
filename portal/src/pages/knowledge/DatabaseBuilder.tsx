@@ -121,9 +121,9 @@ export default function DatabaseBuilderPage() {
       )}
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <section className="space-y-2 rounded-md border border-border p-4">
-          <h2 className="font-medium">Create Table</h2>
+          <h2 className="font-medium">Crear tabla</h2>
           <label className="text-sm">
-            Table Name
+            Nombre de la tabla
             <input className="input" value={tableName} onChange={(e) => setTableName(e.target.value)} />
           </label>
           {fields.map((field, idx) => (

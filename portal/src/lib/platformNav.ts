@@ -31,6 +31,7 @@ import {
   Factory,
   type Icon,
 } from "@phosphor-icons/react";
+import { t } from "./i18n";
 
 export type PlatformNavItem = {
   to: string;
@@ -43,99 +44,136 @@ export type PlatformNavGroup = { label: string; items: PlatformNavItem[] };
 
 const BASE = "/control-center";
 
-/** Labels en inglés (herramienta interna); la jerarquía visual la aplica el shell. */
+/**
+ * Nivel 1 — menú general de Zent.
+ * Textos desde el catálogo (`lib/i18n`); las claves coinciden con `screens.code`.
+ */
 export const PLATFORM_NAV: PlatformNavGroup[] = [
   {
-    label: "Business",
+    label: t("nav.group.business"),
     items: [
-      { to: `${BASE}`, label: "Overview", icon: Gauge, end: true },
-      { to: `${BASE}/tenants`, label: "Tenants", icon: Buildings, permission: "tenant.read" },
-      { to: `${BASE}/customers`, label: "Customers", icon: UsersThree },
-      { to: `${BASE}/subscriptions`, label: "Subscriptions", icon: Cards },
-      { to: `${BASE}/revenue`, label: "Revenue", icon: TrendUp },
-      { to: `${BASE}/partners`, label: "Partners", icon: Handshake },
+      { to: `${BASE}`, label: t("nav.item.overview"), icon: Gauge, end: true },
+      { to: `${BASE}/tenants`, label: t("nav.item.tenants"), icon: Buildings, permission: "tenant.read" },
+      { to: `${BASE}/customers`, label: t("nav.item.customers"), icon: UsersThree },
+      { to: `${BASE}/subscriptions`, label: t("nav.item.subscriptions"), icon: Cards },
+      { to: `${BASE}/revenue`, label: t("nav.item.revenue"), icon: TrendUp },
+      { to: `${BASE}/partners`, label: t("nav.item.partners"), icon: Handshake },
     ],
   },
   {
-    label: "AI Platform",
+    label: t("nav.group.aiPlatform"),
     items: [
-      { to: `${BASE}/model-gateway`, label: "Model Gateway", icon: Coins },
-      { to: `${BASE}/decision-engine`, label: "Decision Engine", icon: FlowArrow },
-      { to: `${BASE}/ai-runtime`, label: "AI Runtime", icon: Cpu },
-      { to: `${BASE}/inference-proxy`, label: "Inference", icon: Cpu },
-      { to: `${BASE}/evals`, label: "Evals", icon: Flask },
-      { to: `${BASE}/feedback`, label: "Feedback", icon: Smiley },
-      { to: `${BASE}/workflows`, label: "Workflows", icon: FlowArrow },
-      { to: `${BASE}/copilot`, label: "Copilot", icon: Robot },
+      { to: `${BASE}/model-gateway`, label: t("nav.item.model-gateway"), icon: Coins },
+      { to: `${BASE}/decision-engine`, label: t("nav.item.decision-engine"), icon: FlowArrow },
+      { to: `${BASE}/ai-runtime`, label: t("nav.item.ai-runtime"), icon: Cpu },
+      { to: `${BASE}/inference-proxy`, label: t("nav.item.inference-proxy"), icon: Cpu },
+      { to: `${BASE}/evals`, label: t("nav.item.evals"), icon: Flask },
+      { to: `${BASE}/feedback`, label: t("nav.item.feedback"), icon: Smiley },
+      { to: `${BASE}/workflows`, label: t("nav.item.workflows"), icon: FlowArrow },
+      { to: `${BASE}/copilot`, label: t("nav.item.copilot"), icon: Robot },
     ],
   },
   {
-    label: "Observability",
+    label: t("nav.group.observability"),
     items: [
-      { to: `${BASE}/analytics`, label: "Analytics", icon: ChartBar },
-      { to: `${BASE}/usage`, label: "Usage", icon: ChartLineUp },
-      { to: `${BASE}/traces`, label: "Traces", icon: GitBranch },
-      { to: `${BASE}/chat-insights`, label: "Chat Insights", icon: ChatText },
-      { to: `${BASE}/model-health`, label: "Model Health", icon: Pulse },
-      { to: `${BASE}/realtime`, label: "Real-Time", icon: Broadcast },
+      { to: `${BASE}/analytics`, label: t("nav.item.analytics"), icon: ChartBar },
+      { to: `${BASE}/usage`, label: t("nav.item.usage"), icon: ChartLineUp },
+      { to: `${BASE}/traces`, label: t("nav.item.traces"), icon: GitBranch },
+      { to: `${BASE}/chat-insights`, label: t("nav.item.chat-insights"), icon: ChatText },
+      { to: `${BASE}/model-health`, label: t("nav.item.model-health"), icon: Pulse },
+      { to: `${BASE}/realtime`, label: t("nav.item.realtime"), icon: Broadcast },
     ],
   },
   {
-    label: "FinOps",
+    label: t("nav.group.finops"),
     items: [
-      { to: `${BASE}/costs`, label: "AI Costs", icon: Coins },
-      { to: `${BASE}/metering`, label: "Metering", icon: Gauge },
-      { to: `${BASE}/cost-governance`, label: "Cost Governance", icon: PiggyBank },
-      { to: `${BASE}/optimizer`, label: "Optimizer", icon: ChartLineUp },
-      { to: `${BASE}/capacity`, label: "Capacity", icon: Gauge },
+      { to: `${BASE}/costs`, label: t("nav.item.costs"), icon: Coins },
+      { to: `${BASE}/metering`, label: t("nav.item.metering"), icon: Gauge },
+      { to: `${BASE}/cost-governance`, label: t("nav.item.cost-governance"), icon: PiggyBank },
+      { to: `${BASE}/optimizer`, label: t("nav.item.optimizer"), icon: ChartLineUp },
+      { to: `${BASE}/capacity`, label: t("nav.item.capacity"), icon: Gauge },
     ],
   },
   {
-    label: "Trust",
+    label: t("nav.group.trust"),
     items: [
-      { to: `${BASE}/trust`, label: "Trust Overview", icon: ShieldCheck },
-      { to: `${BASE}/security-center`, label: "Security Center", icon: ShieldWarning },
-      { to: `${BASE}/trust-safety`, label: "Trust & Safety", icon: ShieldWarning },
-      { to: `${BASE}/risk-center`, label: "Risk Center", icon: ShieldWarning },
-      { to: `${BASE}/governance`, label: "Governance", icon: ShieldCheck },
-      { to: `${BASE}/compliance`, label: "Compliance", icon: ShieldCheck },
-      { to: `${BASE}/audit`, label: "Audit", icon: Scroll, permission: "audit.read" },
-      { to: `${BASE}/audit-intel`, label: "Audit Intelligence", icon: ShieldWarning },
+      { to: `${BASE}/trust`, label: t("nav.item.trust"), icon: ShieldCheck },
+      { to: `${BASE}/security-center`, label: t("nav.item.security-center"), icon: ShieldWarning },
+      { to: `${BASE}/trust-safety`, label: t("nav.item.trust-safety"), icon: ShieldWarning },
+      { to: `${BASE}/risk-center`, label: t("nav.item.risk-center"), icon: ShieldWarning },
+      { to: `${BASE}/governance`, label: t("nav.item.governance"), icon: ShieldCheck },
+      { to: `${BASE}/compliance`, label: t("nav.item.compliance"), icon: ShieldCheck },
+      { to: `${BASE}/audit`, label: t("nav.item.audit"), icon: Scroll, permission: "audit.read" },
+      { to: `${BASE}/audit-intel`, label: t("nav.item.audit-intel"), icon: ShieldWarning },
     ],
   },
   {
-    label: "Operations",
+    label: t("nav.group.operations"),
     items: [
-      { to: `${BASE}/status`, label: "System Status", icon: Pulse },
-      { to: `${BASE}/ops-center`, label: "Ops Center", icon: ShieldCheck },
-      { to: `${BASE}/operations`, label: "Operations", icon: Gauge },
-      { to: `${BASE}/regions`, label: "Regions", icon: Globe },
-      { to: `${BASE}/dr`, label: "Disaster Recovery", icon: Lifebuoy },
-      { to: `${BASE}/migrations`, label: "Migrations", icon: ArrowsLeftRight },
-      { to: `${BASE}/releases`, label: "Releases", icon: GitBranch },
-      { to: `${BASE}/data-export`, label: "Data Export", icon: Package },
+      { to: `${BASE}/status`, label: t("nav.item.status"), icon: Pulse },
+      { to: `${BASE}/ops-center`, label: t("nav.item.ops-center"), icon: ShieldCheck },
+      { to: `${BASE}/operations`, label: t("nav.item.operations"), icon: Gauge },
+      { to: `${BASE}/regions`, label: t("nav.item.regions"), icon: Globe },
+      { to: `${BASE}/dr`, label: t("nav.item.dr"), icon: Lifebuoy },
+      { to: `${BASE}/migrations`, label: t("nav.item.migrations"), icon: ArrowsLeftRight },
+      { to: `${BASE}/releases`, label: t("nav.item.releases"), icon: GitBranch },
+      { to: `${BASE}/data-export`, label: t("nav.item.data-export"), icon: Package },
     ],
   },
   {
-    label: "Platform",
+    label: t("nav.group.platform"),
     items: [
-      { to: `${BASE}/marketplace`, label: "Marketplace", icon: Storefront },
-      { to: `${BASE}/marketplace-factory`, label: "Marketplace Factory", icon: Factory },
-      { to: `${BASE}/ecosystem`, label: "Ecosystem", icon: Storefront },
-      { to: `${BASE}/notifications`, label: "Notifications", icon: BellSimple },
-      { to: `${BASE}/onboarding`, label: "Onboarding", icon: RocketLaunch },
-      { to: `${BASE}/security`, label: "Security", icon: ShieldCheck, permission: "platform.users.manage" },
-      { to: `${BASE}/settings`, label: "Settings", icon: UsersThree, permission: "platform.settings.manage" },
+      { to: `${BASE}/marketplace`, label: t("nav.item.marketplace"), icon: Storefront },
+      { to: `${BASE}/marketplace-factory`, label: t("nav.item.marketplace-factory"), icon: Factory },
+      { to: `${BASE}/ecosystem`, label: t("nav.item.ecosystem"), icon: Storefront },
+      { to: `${BASE}/notifications`, label: t("nav.item.notifications"), icon: BellSimple },
+      { to: `${BASE}/onboarding`, label: t("nav.item.onboarding"), icon: RocketLaunch },
+      { to: `${BASE}/staff`, label: t("nav.item.staff"), icon: UsersThree, permission: "platform.users.manage" },
+      { to: `${BASE}/security`, label: t("nav.item.security"), icon: ShieldCheck, permission: "platform.users.manage" },
+      { to: `${BASE}/settings`, label: t("nav.item.settings"), icon: UsersThree, permission: "platform.settings.manage" },
     ],
   },
 ];
 
-export function visiblePlatformNav(permissions?: string[]): PlatformNavGroup[] {
-  if (!permissions || permissions.length === 0) return PLATFORM_NAV;
-  const allow = new Set(permissions);
+/**
+ * Código de pantalla de un ítem: misma clave que `screens.code` en la base.
+ * `/control-center/tenants` → `tenants` · `/control-center` → `overview`.
+ */
+export function screenCodeForPath(to: string): string {
+  if (to === BASE) return "overview";
+  return to.startsWith(`${BASE}/`) ? to.slice(BASE.length + 1) : to;
+}
+
+/**
+ * Filtra el menú por permisos de API y por pantallas asignadas.
+ *
+ * `screens === undefined` conserva el comportamiento anterior (no filtra por
+ * pantalla). Un arreglo vacío no muestra nada: el modelo es default-deny.
+ */
+export function visiblePlatformNav(
+  permissions?: string[],
+  screens?: string[],
+): PlatformNavGroup[] {
+  const allowPerm =
+    permissions && permissions.length > 0 ? new Set(permissions) : null;
+  const allowScreens = screens ? new Set(screens) : null;
+  if (!allowPerm && !allowScreens) return PLATFORM_NAV;
   return PLATFORM_NAV.map((g) => ({
     ...g,
-    items: g.items.filter((it) => !it.permission || allow.has(it.permission) || allow.has("*")),
+    items: g.items.filter((it) => {
+      if (
+        allowPerm &&
+        it.permission &&
+        !allowPerm.has(it.permission) &&
+        !allowPerm.has("*")
+      ) {
+        return false;
+      }
+      if (allowScreens && !allowScreens.has(screenCodeForPath(it.to))) {
+        return false;
+      }
+      return true;
+    }),
   })).filter((g) => g.items.length > 0);
 }
 

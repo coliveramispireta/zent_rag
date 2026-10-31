@@ -66,7 +66,7 @@ export function WorkflowApiPanel({
         { method: "POST", token: session.token, organizationId: session.organizationId },
       );
       onSecret(out.hook_secret);
-      setMsg("Secret nuevo emitido. Cópialo ahora: no se vuelve a mostrar.");
+      setMsg("Secreto nuevo emitido. Cópialo ahora: no se vuelve a mostrar.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -83,7 +83,7 @@ export function WorkflowApiPanel({
     <div className="space-y-4" data-testid="wf-api-panel">
       <section className="panel space-y-3 p-4">
         <div>
-          <h2 className="text-sm font-semibold text-text">API del workflow</h2>
+          <h2 className="text-sm font-semibold text-text">API del flujo</h2>
           <p className="mt-0.5 text-xs text-muted">
             Cualquier sistema puede disparar este workflow con un POST autenticado por secret.
           </p>
@@ -122,7 +122,7 @@ export function WorkflowApiPanel({
             <dd className="mt-0.5 font-mono text-[11px] text-text">X-Zent-Workflow-Secret</dd>
             <p className="mt-1 text-[10px] text-muted">
               En Bruno/Postman: pestaña <span className="font-medium text-text">Headers</span>, no
-              Params. El secret en la URL da 401 y queda en logs.
+              Params. El secreto en la URL da 401 y queda en los logs.
             </p>
           </div>
           <div>
@@ -132,7 +132,7 @@ export function WorkflowApiPanel({
         </dl>
 
         <div className="rounded-md border border-border p-3">
-          <p className="text-xs font-semibold text-text">Secret</p>
+          <p className="text-xs font-semibold text-text">Secreto</p>
           {secret ? (
             <>
               <p className="mt-1 break-all font-mono text-[11px] text-text" data-testid="wf-hook-secret">

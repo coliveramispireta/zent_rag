@@ -74,7 +74,7 @@ export default function Settings() {
   return (
     <div className="flex flex-col gap-3">
       <PageHeader
-        title="Settings"
+        title="Configuración"
         subtitle="Configuración de la plataforma (solo lecturas; sin secrets)."
         actions={
           <ButtonLink
@@ -429,7 +429,7 @@ function ScreenSwitchPanel() {
               ))}
             </Select>
           </Field>
-          <Field label="Usuario" hint="Por defecto se impersona al owner del tenant.">
+          <Field label="Usuario" hint="Por defecto se impersona al propietario de la organización.">
             <Select
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
