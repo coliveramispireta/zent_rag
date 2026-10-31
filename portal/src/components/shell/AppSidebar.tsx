@@ -125,11 +125,15 @@ function SidebarNav({
     () =>
       NAV_GROUPS.map((group) => ({
         ...group,
-        items: group.items?.filter((item) => canSeeNavItem(session, item.key, entitlements)),
+        items: group.items?.filter((item) =>
+          canSeeNavItem(session, item.key, entitlements),
+        ),
         sections: group.sections
           ?.map((s) => ({
             heading: s.heading,
-            items: s.items.filter((item) => canSeeNavItem(session, item.key, entitlements)),
+            items: s.items.filter((item) =>
+              canSeeNavItem(session, item.key, entitlements),
+            ),
           }))
           .filter((s) => s.items.length > 0),
       })).filter(

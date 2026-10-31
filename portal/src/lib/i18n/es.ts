@@ -8,6 +8,8 @@
 export const es = {
   // Nivel 1 — grupos del menú
   "nav.group.business": "Negocio",
+  "nav.group.general": "General",
+  "nav.group.monitoring": "Monitoreo general",
   "nav.group.aiPlatform": "Plataforma de IA",
   "nav.group.observability": "Observabilidad",
   "nav.group.finops": "FinOps",
@@ -18,6 +20,7 @@ export const es = {
   // Nivel 1 — pantallas (mismas claves que `screens.code`)
   "nav.item.overview": "Resumen",
   "nav.item.tenants": "Organizaciones",
+  "nav.item.applications": "Aplicaciones",
   "nav.item.customers": "Clientes",
   "nav.item.subscriptions": "Suscripciones",
   "nav.item.revenue": "Ingresos",

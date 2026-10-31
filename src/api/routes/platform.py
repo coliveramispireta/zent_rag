@@ -3,6 +3,7 @@
 # =============================================================================
 from __future__ import annotations
 
+import re
 from typing import Literal
 from uuid import UUID
 
@@ -1473,6 +1474,276 @@ async def my_screens_route(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# Aplicaciones — origen del acceso de una organización (Nivel 2)
+# ---------------------------------------------------------------------------
+
+
+class ApplicationCreateIn(BaseModel):
+    code: str = Field(..., min_length=2, max_length=60)
+    name: str = Field(..., min_length=1, max_length=200)
+    kind: str = Field("product", max_length=40)
+    description: str | None = Field(None, max_length=1000)
+    partner_id: str | None = None
+
+
+class ApplicationUpdateIn(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=200)
+    status: Literal["active", "suspended", "retired"] | None = None
+    description: str | None = None
+
+
+@router.get("/applications", summary="Aplicaciones de la plataforma")
+async def list_applications_route(request: Request):
+    require_platform_permission(request, "tenant.read")
+    from src.platform.applications.repo import list_applications
+
+    applications = await list_applications()
+    return {"applications": applications, "count": len(applications)}
+
+
+@router.post("/applications", summary="Alta de una aplicación")
+async def create_application_route(body: ApplicationCreateIn, request: Request):
+    ctx = require_platform_permission(request, "platform.settings.manage")
+    from sqlalchemy.exc import IntegrityError
+
+    from src.platform.applications.repo import create_application
+
+    code = body.code.strip().lower()
+    if not re.fullmatch(r"[a-z0-9][a-z0-9_-]{1,59}", code):
+        raise HTTPException(
+            400, "code debe ser minúsculas, números, guion o guion bajo"
+        )
+    partner_id = None
+    if body.partner_id:
+        try:
+            partner_id = UUID(body.partner_id)
+        except ValueError:
+            raise HTTPException(400, "partner_id must be a valid UUID")
+    try:
+        application = await create_application(
+            code=code,
+            name=body.name.strip(),
+            kind=body.kind,
+            description=body.description,
+            partner_id=partner_id,
+        )
+    except IntegrityError:
+        raise HTTPException(409, "Ya existe una aplicación con ese code")
+    await _audit().write_or_raise(
+        ctx,
+        "platform.application_created",
+        "application",
+        application["id"],
+        ip_address=_client_ip(request),
+        metadata={"code": code},
+    )
+    return application
+
+
+@router.patch("/applications/{app_id}", summary="Editar una aplicación")
+async def update_application_route(
+    app_id: str, body: ApplicationUpdateIn, request: Request
+):
+    ctx = require_platform_permission(request, "platform.settings.manage")
+    from src.platform.applications.repo import update_application
+
+    try:
+        aid = UUID(app_id)
+    except ValueError:
+        raise HTTPException(400, "app_id must be a valid UUID")
+    application = await update_application(
+        aid,
+        name=body.name,
+        status=body.status,
+        description=body.description,
+    )
+    if application is None:
+        raise HTTPException(404, "Application not found")
+    await _audit().write_or_raise(
+        ctx,
+        "platform.application_updated",
+        "application",
+        app_id,
+        ip_address=_client_ip(request),
+    )
+    return application
+
+
+class KeyApplicationIn(BaseModel):
+    application_id: str | None = None
+
+
+@router.patch(
+    "/api-keys/{key_id}/application",
+    summary="Asignar (o quitar) la aplicación de una clave de API",
+)
+async def set_key_application_route(
+    key_id: str, body: KeyApplicationIn, request: Request
+):
+    ctx = require_platform_permission(request, "tenant.write")
+    try:
+        kid = UUID(key_id)
+    except ValueError:
+        raise HTTPException(400, "key_id must be a valid UUID")
+    app_id = None
+    if body.application_id:
+        try:
+            app_id = UUID(body.application_id)
+        except ValueError:
+            raise HTTPException(400, "application_id must be a valid UUID")
+
+    session = await get_async_session()
+    try:
+        row = (
+            await session.execute(
+                text(
+                    "UPDATE api_keys SET application_id = :aid "
+                    "WHERE id = :kid "
+                    "RETURNING id, organization_id, application_id"
+                ),
+                {"aid": app_id, "kid": kid},
+            )
+        ).fetchone()
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
+    if row is None:
+        raise HTTPException(404, "API key not found")
+    await _audit().write_or_raise(
+        ctx,
+        "platform.api_key_application_set",
+        "api_key",
+        key_id,
+        ip_address=_client_ip(request),
+        metadata={"application_id": str(app_id) if app_id else None},
+    )
+    return {
+        "id": str(row.id),
+        "organization_id": str(row.organization_id),
+        "application_id": str(row.application_id) if row.application_id else None,
+    }
+
+
+@router.get(
+    "/organizations/{org_id}/applications",
+    summary="Aplicaciones por las que consume una organización",
+)
+async def organization_applications_route(org_id: str, request: Request):
+    oid = await _require_org(request, org_id, "tenant.read")
+    from src.platform.applications.repo import organization_applications
+
+    return await organization_applications(oid)
+
+
+# ---------------------------------------------------------------------------
+# Parámetros de la organización (Nivel 2)
+# ---------------------------------------------------------------------------
+
+
+class OrgParametersIn(BaseModel):
+    rate_limit_per_minute: int = Field(..., ge=1, le=1_000_000)
+    max_tokens_per_request: int = Field(..., ge=1, le=10_000_000)
+    llm_model_override: str | None = Field(None, max_length=100)
+    embedding_model_override: str | None = Field(None, max_length=100)
+
+
+_PARAMS_SELECT = """
+    SELECT id, name, status, rate_limit_per_minute, max_tokens_per_request,
+           llm_model_override, embedding_model_override, config_json, created_at
+    FROM organizations WHERE id = :oid
+"""
+
+
+async def _read_org_parameters(oid) -> dict | None:
+    session = await get_async_session()
+    try:
+        row = (
+            await session.execute(text(_PARAMS_SELECT), {"oid": oid})
+        ).fetchone()
+    finally:
+        await session.close()
+    if row is None:
+        return None
+    return {
+        "id": str(row.id),
+        "name": row.name,
+        "status": row.status,
+        "rate_limit_per_minute": row.rate_limit_per_minute,
+        "max_tokens_per_request": row.max_tokens_per_request,
+        "llm_model_override": row.llm_model_override,
+        "embedding_model_override": row.embedding_model_override,
+        "config_json": row.config_json or {},
+        "created_at": _iso(row.created_at),
+    }
+
+
+@router.get(
+    "/organizations/{org_id}/parameters",
+    summary="Parámetros de la organización",
+)
+async def get_org_parameters(org_id: str, request: Request):
+    oid = await _require_org(request, org_id, "tenant.read")
+    params = await _read_org_parameters(oid)
+    if params is None:
+        raise HTTPException(404, "Organization not found")
+    return params
+
+
+@router.put(
+    "/organizations/{org_id}/parameters",
+    summary="Actualizar parámetros de la organización",
+)
+async def set_org_parameters(
+    org_id: str, body: OrgParametersIn, request: Request
+):
+    ctx, oid = await _require_org_ctx(request, org_id, "tenant.write")
+    session = await get_async_session()
+    try:
+        await session.execute(
+            text(
+                "UPDATE organizations SET "
+                "rate_limit_per_minute = :rl, "
+                "max_tokens_per_request = :mt, "
+                "llm_model_override = :llm, "
+                "embedding_model_override = :emb, "
+                "updated_at = NOW() "
+                "WHERE id = :oid"
+            ),
+            {
+                "rl": body.rate_limit_per_minute,
+                "mt": body.max_tokens_per_request,
+                "llm": (body.llm_model_override or "").strip() or None,
+                "emb": (body.embedding_model_override or "").strip() or None,
+                "oid": oid,
+            },
+        )
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
+    await _audit().write_or_raise(
+        ctx,
+        "platform.organization_parameters_updated",
+        "organization",
+        org_id,
+        ip_address=_client_ip(request),
+        metadata={
+            "rate_limit_per_minute": body.rate_limit_per_minute,
+            "max_tokens_per_request": body.max_tokens_per_request,
+        },
+    )
+    params = await _read_org_parameters(oid)
+    if params is None:
+        raise HTTPException(404, "Organization not found")
+    return params
+
+
+# ---------------------------------------------------------------------------
 # Control total de usuarios — plataforma y tenant (por usuario)
 # ---------------------------------------------------------------------------
 
@@ -2233,7 +2504,7 @@ async def tenant_security(org_id: str, request: Request):
         keys = (
             await session.execute(
                 text(
-                    "SELECT id, name, key_prefix, scopes, is_active, "
+                    "SELECT id, name, key_prefix, scopes, is_active, application_id, "
                     "last_used_at, expires_at, created_at "
                     "FROM api_keys WHERE organization_id = :oid "
                     "ORDER BY created_at DESC LIMIT 50"
@@ -2251,6 +2522,7 @@ async def tenant_security(org_id: str, request: Request):
                 "prefix": r.key_prefix,
                 "scopes": list(r.scopes or []),
                 "is_active": bool(r.is_active),
+                "application_id": str(r.application_id) if r.application_id else None,
                 "last_used_at": _iso(r.last_used_at),
                 "expires_at": _iso(r.expires_at),
                 "created_at": _iso(r.created_at),

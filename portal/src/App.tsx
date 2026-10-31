@@ -48,18 +48,14 @@ function LegacyKnowledgeRedirect({
 const ChatPage = lazy(() => import("./pages/Chat"));
 const DashboardPage = lazy(() => import("./pages/Dashboard"));
 const KeysPage = lazy(() => import("./pages/Keys"));
-const LoginPage = lazy(() => import("./pages/Login"));
 const PromptsPage = lazy(() => import("./pages/Prompts"));
-const SignupPage = lazy(() => import("./pages/Signup"));
 const UsagePage = lazy(() => import("./pages/Usage"));
-const ProjectsPage = lazy(() => import("./pages/Projects"));
 const AgentsPage = lazy(() => import("./pages/Agents"));
 const AgentStudioPage = lazy(() => import("./pages/AgentStudio"));
 const AgentBuilderRedirectPage = lazy(() =>
   import("./pages/AgentEntry").then((m) => ({ default: m.AgentBuilderRedirect })),
 );
 const ConnectorsPage = lazy(() => import("./pages/Connectors"));
-const BillingPage = lazy(() => import("./pages/Billing"));
 const SettingsPage = lazy(() => import("./pages/Settings"));
 const KnowledgeSourcesPage = lazy(() => import("./pages/knowledge/Sources"));
 const KnowledgeHomePage = lazy(() => import("./pages/knowledge/Home"));
@@ -88,11 +84,8 @@ const KnowledgeManagedImportPage = lazy(() => import("./pages/knowledge/ManagedI
 const KnowledgeSourceDetailPage = lazy(() => import("./pages/knowledge/SourceDetail"));
 const KnowledgeWorkspacesPage = lazy(() => import("./pages/knowledge/KnowledgeWorkspaces"));
 const KnowledgeWorkspacePage = lazy(() => import("./pages/knowledge/KnowledgeWorkspace"));
-const TransitionWizardPage = lazy(() => import("./pages/onboarding/TransitionWizard"));
-const StartModePage = lazy(() => import("./pages/onboarding/StartMode"));
 const EvaluationGapsPage = lazy(() => import("./pages/evaluation/Gaps"));
 const EvaluationImpactPage = lazy(() => import("./pages/evaluation/Impact"));
-const WorkspacesPage = lazy(() => import("./pages/Workspaces"));
 const TrainingPage = lazy(() => import("./pages/Training"));
 const DeveloperCenterPage = lazy(() => import("./pages/DeveloperCenter"));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
@@ -108,6 +101,8 @@ const AdminSecurityPage = lazy(() => import("./pages/admin/Security"));
 const AdminAuditPage = lazy(() => import("./pages/admin/Audit"));
 const AdminSettingsPage = lazy(() => import("./pages/admin/Settings"));
 const AdminStaffPage = lazy(() => import("./pages/admin/Staff"));
+const AdminOrgContextPage = lazy(() => import("./pages/admin/OrgContext"));
+const AdminApplicationsPage = lazy(() => import("./pages/admin/Applications"));
 const AdminFinOpsPage = lazy(() => import("./pages/admin/FinOps"));
 const AdminSystemStatusPage = lazy(() => import("./pages/admin/SystemStatus"));
 const SsoCallbackPage = lazy(() => import("./pages/SsoCallback"));
@@ -177,7 +172,6 @@ const RoleStudioPage = lazy(() => import("./pages/RoleStudio"));
 const SolutionBuilderPage = lazy(() => import("./pages/SolutionBuilder"));
 const SolutionWorkspacePage = lazy(() => import("./pages/SolutionWorkspace"));
 const MigrationsPage = lazy(() => import("./pages/Migrations"));
-const OnboardingPage = lazy(() => import("./pages/Onboarding"));
 const EvaluationDatasetsPage = lazy(() => import("./pages/evaluation/Datasets"));
 const EvaluationOverviewPage = lazy(() => import("./pages/evaluation/Overview"));
 const EvaluationRunsPage = lazy(() => import("./pages/evaluation/Runs"));
@@ -211,7 +205,6 @@ const CompanyInstitutionalPage = lazy(
 );
 const CompanyAskPage = lazy(() => import("./pages/companyIntelligence/Ask"));
 const WebhooksPage = lazy(() => import("./pages/Webhooks"));
-const TeamAccessPage = lazy(() => import("./pages/TeamAccess"));
 const SecurityAuditPage = lazy(() => import("./pages/SecurityAudit"));
 const McpPage = lazy(() => import("./pages/Mcp"));
 
@@ -494,9 +487,8 @@ export default function App() {
   return (
     <>
       <Routes>
-      <Route path="/login" element={<Suspense fallback={<PageFallback />}><LoginPage /></Suspense>} />
-      <Route path="/signup" element={<Suspense fallback={<PageFallback />}><SignupPage /></Suspense>} />
-      <Route path="/onboarding/start" element={<Suspense fallback={<PageFallback />}><StartModePage /></Suspense>} />
+      {/* Zent es interno: el único acceso es el del personal de Omnio. */}
+      <Route path="/login" element={<Navigate to="/control-center/login" replace />} />
         <Route path="/sso/callback" element={<Suspense fallback={<PageFallback />}><SsoCallbackPage /></Suspense>} />
         <Route path="/share/agent/:token" element={<Suspense fallback={<PageFallback />}><SharedAgentPage /></Suspense>} />
       <Route path="/admin/login" element={<Suspense fallback={<PageFallback />}><AdminLoginPage /></Suspense>} />
@@ -560,6 +552,8 @@ export default function App() {
         <Route path="operations" element={<Suspense fallback={<PageFallback />}><AdminOperationsPage /></Suspense>} />
         <Route path="security" element={<Suspense fallback={<PageFallback />}><AdminSecurityPage /></Suspense>} />
         <Route path="audit" element={<Suspense fallback={<PageFallback />}><AdminAuditPage /></Suspense>} />
+        <Route path="applications" element={<Suspense fallback={<PageFallback />}><AdminApplicationsPage /></Suspense>} />
+        <Route path="org/:orgId" element={<Suspense fallback={<PageFallback />}><AdminOrgContextPage /></Suspense>} />
         <Route path="staff" element={<Suspense fallback={<PageFallback />}><AdminStaffPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<PageFallback />}><AdminSettingsPage /></Suspense>} />
         <Route path="settings/plans" element={<Suspense fallback={<PageFallback />}><AdminPlansPage /></Suspense>} />
@@ -622,7 +616,6 @@ export default function App() {
         <Route path="/knowledge/sources" element={<Suspense fallback={<PageFallback />}><KnowledgeSourcesPage /></Suspense>} />
         <Route path="/knowledge/database/import" element={<Suspense fallback={<PageFallback />}><KnowledgeManagedImportPage /></Suspense>} />
         <Route path="/knowledge/database" element={<Suspense fallback={<PageFallback />}><KnowledgeDatabasePage /></Suspense>} />
-        <Route path="/onboarding/transition" element={<Suspense fallback={<PageFallback />}><TransitionWizardPage /></Suspense>} />
         <Route path="/knowledge/collections" element={<Suspense fallback={<PageFallback />}><KnowledgeCollectionsPage /></Suspense>} />
         <Route path="/knowledge/documents" element={<Suspense fallback={<PageFallback />}><KnowledgeDocumentsPage /></Suspense>} />
         <Route path="/knowledge/sql" element={<Suspense fallback={<PageFallback />}><KnowledgeSqlPage /></Suspense>} />
@@ -634,9 +627,6 @@ export default function App() {
         <Route path="/knowledge/glossary" element={<Suspense fallback={<PageFallback />}><KnowledgeGlossaryPage /></Suspense>} />
         <Route path="/prompts" element={<Suspense fallback={<PageFallback />}><PromptsPage /></Suspense>} />
         <Route path="/chat" element={<Suspense fallback={<PageFallback />}><ChatPage /></Suspense>} />
-        <Route path="/team" element={<Suspense fallback={<PageFallback />}><TeamAccessPage /></Suspense>} />
-        <Route path="/projects" element={<Suspense fallback={<PageFallback />}><ProjectsPage /></Suspense>} />
-        <Route path="/workspaces" element={<Suspense fallback={<PageFallback />}><WorkspacesPage /></Suspense>} />
         <Route path="/training" element={<Suspense fallback={<PageFallback />}><TrainingPage /></Suspense>} />
         <Route path="/developers" element={<Suspense fallback={<PageFallback />}><DeveloperCenterPage /></Suspense>} />
         <Route path="/developers/mcp" element={<Suspense fallback={<PageFallback />}><McpPage /></Suspense>} />
@@ -647,7 +637,6 @@ export default function App() {
         <Route path="/agents/:id/builder" element={<Suspense fallback={<PageFallback />}><AgentBuilderRedirectPage /></Suspense>} />
         <Route path="/agents/:id" element={<Suspense fallback={<PageFallback />}><AgentStudioPage /></Suspense>} />
         <Route path="/connectors" element={<Suspense fallback={<PageFallback />}><ConnectorsPage /></Suspense>} />
-        <Route path="/billing" element={<Suspense fallback={<PageFallback />}><BillingPage /></Suspense>} />
         <Route path="/ai-quality" element={<Suspense fallback={<PageFallback />}><AiQualityPage /></Suspense>} />
         <Route path="/deployments" element={<Suspense fallback={<PageFallback />}><DeploymentsPage /></Suspense>} />
               <Route path="/environments" element={<Suspense fallback={<PageFallback />}><EnvironmentsPage /></Suspense>} />
@@ -656,7 +645,6 @@ export default function App() {
         <Route path="/security" element={<Suspense fallback={<PageFallback />}><SecurityAuditPage /></Suspense>} />
         <Route path="/audit/compliance" element={<Suspense fallback={<PageFallback />}><AuditCompliancePage /></Suspense>} />
         <Route path="/notifications" element={<Suspense fallback={<PageFallback />}><NotificationsPage /></Suspense>} />
-        <Route path="/onboarding" element={<Suspense fallback={<PageFallback />}><OnboardingPage /></Suspense>} />
         <Route path="/migrations" element={<Suspense fallback={<PageFallback />}><MigrationsPage /></Suspense>} />
         <Route path="/releases" element={<Suspense fallback={<PageFallback />}><ReleasesPage /></Suspense>} />
         <Route path="/copilot" element={<Suspense fallback={<PageFallback />}><CopilotPage /></Suspense>} />

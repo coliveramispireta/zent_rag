@@ -490,6 +490,38 @@ async def get_effective_screens(user_id: UUID) -> list[dict]:
     ]
 
 
+async def get_screen_permissions(user_id: UUID) -> set[str]:
+    """Permisos de API que aportan las pantallas asignadas al usuario.
+
+    `permissions` se otorga siempre; `write_permissions` solo cuando el nivel
+    de esa pantalla es `full`. Sin pantallas no se otorga nada (default-deny).
+    """
+    effective = await get_effective_screens(user_id)
+    if not effective:
+        return set()
+    levels = {item["code"]: item["level"] for item in effective}
+    session = await get_async_session()
+    try:
+        rows = (
+            await session.execute(
+                text(
+                    "SELECT code, permissions, write_permissions FROM screens "
+                    "WHERE code = ANY(:codes)"
+                ),
+                {"codes": list(levels)},
+            )
+        ).fetchall()
+    finally:
+        await session.close()
+
+    granted: set[str] = set()
+    for row in rows:
+        granted.update(row.permissions or [])
+        if levels.get(row.code) == "full":
+            granted.update(row.write_permissions or [])
+    return granted
+
+
 async def list_role_screens() -> dict[str, list[str]]:
     """Pantallas asignadas a cada rol (vacías si nadie las asignó)."""
     session = await get_async_session()

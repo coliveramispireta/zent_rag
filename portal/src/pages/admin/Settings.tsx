@@ -400,7 +400,7 @@ function ScreenSwitchPanel() {
                 size="sm"
                 onClick={() => window.location.assign("/")}
               >
-                Abrir portal de clientes
+                Entrar como la organización (soporte)
               </Button>
               <Button
                 variant="ghost"

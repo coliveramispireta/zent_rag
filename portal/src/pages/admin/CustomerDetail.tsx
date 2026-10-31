@@ -774,9 +774,14 @@ export default function AdminCustomerDetailPage() {
         title={company}
         subtitle={data?.email || undefined}
         actions={
-          <ButtonLink variant="secondary" to="/control-center/tenants" leadingIcon={ArrowLeft}>
-            Volver
-          </ButtonLink>
+          <div className="flex items-center gap-2">
+            <ButtonLink variant="secondary" to={`/control-center/org/${orgId}`}>
+              Abrir contexto de la organización
+            </ButtonLink>
+            <ButtonLink variant="secondary" to="/control-center/tenants" leadingIcon={ArrowLeft}>
+              Volver
+            </ButtonLink>
+          </div>
         }
       />
       <ErrorInline message={error} />

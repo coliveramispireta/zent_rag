@@ -20,6 +20,9 @@ import { IdleSessionWarning } from "../../components/IdleSessionWarning";
 import { StepUpModal } from "../../components/StepUpModal";
 import { ThemeToggle } from "../../components/ThemeToggle";
 import { Brand, IdentityTile } from "../../components/Brand";
+import { OrgPicker, type OrgOption } from "../../components/shell/OrgPicker";
+import { OrgSidebar } from "../../components/shell/OrgSidebar";
+import { parseOrgSection, sectionLabel } from "../../lib/orgSections";
 import {
   Badge,
   Breadcrumbs,
@@ -167,20 +170,23 @@ function ControlNav({
     }
   }, [collapsedGroups]);
 
-  // Un grupo colapsado que contiene la ruta activa se abre solo.
+  // Una sola categoría abierta: al cambiar de ruta se abre la del ítem activo
+  // y se contraen las demás.
   useEffect(() => {
     setCollapsedGroups((prev) => {
-      const hiddenActive = navGroups
-        .filter((g) => prev.includes(g.label))
-        .filter((g) =>
-          g.items.some(
-            (item) =>
-              pathname === item.to || (item.to !== BASE && pathname.startsWith(`${item.to}/`))
-          )
-        )
-        .map((g) => g.label);
-      if (hiddenActive.length === 0) return prev;
-      return prev.filter((label) => !hiddenActive.includes(label));
+      const active = navGroups.find((g) =>
+        g.items.some(
+          (item) =>
+            pathname === item.to ||
+            (item.to !== BASE && pathname.startsWith(`${item.to}/`)),
+        ),
+      );
+      const next = navGroups
+        .map((g) => g.label)
+        .filter((label) => label !== active?.label);
+      const same =
+        next.length === prev.length && next.every((label) => prev.includes(label));
+      return same ? prev : next;
     });
   }, [pathname, navGroups]);
 
@@ -192,9 +198,13 @@ function ControlNav({
     : [];
 
   function toggleGroup(label: string) {
-    setCollapsedGroups((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
-    );
+    setCollapsedGroups((prev) => {
+      if (prev.includes(label)) {
+        // Abrir una categoría cierra las demás.
+        return navGroups.map((g) => g.label).filter((other) => other !== label);
+      }
+      return [...prev, label];
+    });
   }
 
   return (
@@ -387,6 +397,7 @@ export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [unread, setUnread] = useState(0);
+  const [orgs, setOrgs] = useState<OrgOption[]>([]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-sidebar", collapsed ? "collapsed" : "expanded");
@@ -400,6 +411,16 @@ export default function AdminLayout() {
   useEffect(() => {
     setDrawer(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!session) return;
+    platformApi<{ organizations: OrgOption[] }>(
+      "/api/v1/platform/organizations",
+      { token: session.token },
+    )
+      .then((data) => setOrgs(data.organizations ?? []))
+      .catch(() => setOrgs([]));
+  }, [session]);
 
   const loadNotices = useCallback(async () => {
     if (!session) return;
@@ -447,12 +468,29 @@ export default function AdminLayout() {
   }
 
   const context = platformNavContextForPath(location.pathname);
-  const pageTitle = context?.item.label ?? "Overview";
-  const crumbs = [
-    { label: "Control Center", to: BASE },
-    ...(context ? [{ label: context.group.label }] : []),
-    { label: pageTitle },
-  ];
+  // Nivel 2: `/control-center/org/:orgId` → Zent › Organización › Sección.
+  const orgId = location.pathname.match(/^\/control-center\/org\/([^/]+)/)?.[1];
+  const orgLabel = orgs.find((item) => item.id === orgId);
+  const contextOrgName = orgLabel
+    ? orgLabel.company_name || orgLabel.name
+    : "Organización";
+  const orgSection = parseOrgSection(
+    new URLSearchParams(location.search).get("seccion"),
+  );
+  const pageTitle = orgId
+    ? sectionLabel(orgSection)
+    : (context?.item.label ?? "Overview");
+  const crumbs = orgId
+    ? [
+        { label: "Zent", to: BASE },
+        { label: contextOrgName, to: `${BASE}/org/${orgId}` },
+        { label: pageTitle },
+      ]
+    : [
+        { label: "Control Center", to: BASE },
+        ...(context ? [{ label: context.group.label }] : []),
+        { label: pageTitle },
+      ];
 
   return (
     <div className="min-h-[100dvh]">
@@ -466,6 +504,16 @@ export default function AdminLayout() {
           instanceId="desktop"
         />
       </aside>
+
+      {orgId && (
+        <aside className="app-org-sidebar fixed inset-y-0 z-20 hidden border-r border-border bg-surface lg:block">
+          <OrgSidebar
+            orgId={orgId}
+            orgName={contextOrgName}
+            activeSection={orgSection}
+          />
+        </aside>
+      )}
 
       <Drawer
         open={drawer}
@@ -484,9 +532,23 @@ export default function AdminLayout() {
           showHeader={false}
           onNavigate={() => setDrawer(false)}
         />
+        {orgId && (
+          <div className="mt-3 border-t border-border pt-3">
+            <OrgSidebar
+              orgId={orgId}
+              orgName={contextOrgName}
+              activeSection={orgSection}
+            />
+          </div>
+        )}
       </Drawer>
 
-      <div className="app-main flex min-h-[100dvh] min-w-0 flex-col">
+      <div
+        className={cn(
+          "app-main flex min-h-[100dvh] min-w-0 flex-col",
+          orgId && "app-main--with-org",
+        )}
+      >
         <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-border bg-bg/85 px-4 py-2 backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2.5">
             <IconButton
@@ -510,6 +572,9 @@ export default function AdminLayout() {
             <Breadcrumbs items={crumbs} className="hidden min-w-0 sm:flex" />
             <span className="truncate text-[15px] font-medium text-text sm:hidden" data-page-title>
               {pageTitle}
+            </span>
+            <span className="hidden md:block">
+              <OrgPicker orgs={orgs} currentOrgId={orgId} />
             </span>
           </div>
 

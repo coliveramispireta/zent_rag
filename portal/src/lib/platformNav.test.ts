@@ -13,16 +13,15 @@ describe("visiblePlatformNav", () => {
 
   it("filtra items sin permiso y grupos vacíos", () => {
     const out = visiblePlatformNav(["audit.read"]);
-    // Seguridad (platform.users.manage) y Configuración (platform.settings.manage) quedan fuera.
-    const platform = out.find((g) => g.label === "Plataforma");
-    expect(platform?.items.find((i) => i.label === "Seguridad")).toBeUndefined();
-    expect(platform?.items.find((i) => i.label === "Configuración")).toBeUndefined();
-    // Auditoría sí, bajo Confianza.
-    const trust = out.find((g) => g.label === "Confianza");
-    expect(trust?.items.find((i) => i.label === "Auditoría")).toBeDefined();
-    // Organizaciones (tenant.read) no concedido -> Negocio sin ese item.
-    const business = out.find((g) => g.label === "Negocio");
-    expect(business?.items.find((i) => i.label === "Organizaciones")).toBeUndefined();
+    // General: Seguridad y Configuración piden permisos que no están.
+    const general = out.find((g) => g.label === "General");
+    expect(general?.items.find((i) => i.label === "Seguridad")).toBeUndefined();
+    expect(general?.items.find((i) => i.label === "Configuración")).toBeUndefined();
+    // Auditoría sí, bajo Operación.
+    const ops = out.find((g) => g.label === "Operación");
+    expect(ops?.items.find((i) => i.label === "Auditoría")).toBeDefined();
+    // Organizaciones (tenant.read) no concedido -> General sin ese item.
+    expect(general?.items.find((i) => i.label === "Organizaciones")).toBeUndefined();
   });
 
   it("super_admin (permiso '*') ve todo", () => {
@@ -40,7 +39,7 @@ describe("visiblePlatformNav — pantallas asignadas", () => {
     const out = visiblePlatformNav(undefined, ["tenants", "staff"]);
     const items = out.flatMap((group) => group.items.map((item) => item.to));
     expect(items).toEqual(["/control-center/tenants", "/control-center/staff"]);
-    expect(out.map((group) => group.label)).toEqual(["Negocio", "Plataforma"]);
+    expect(out.map((group) => group.label)).toEqual(["General"]);
   });
 
   it("exige pantalla y permiso a la vez", () => {

@@ -1069,6 +1069,25 @@
   }
 }
 
+/* Nivel 2: segundo sidebar con las secciones de la organización. */
+:root {
+  --org-sidebar-w: 236px;
+}
+
+.app-org-sidebar {
+  width: var(--org-sidebar-w);
+  left: var(--sidebar-w);
+  transition:
+    left var(--dur-4) var(--ease-swift),
+    width var(--dur-4) var(--ease-swift);
+}
+
+@media (min-width: 1024px) {
+  .app-main--with-org {
+    padding-left: calc(var(--sidebar-w) + var(--org-sidebar-w));
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Acceso: escena cognitiva                                            */
 /* ------------------------------------------------------------------ */

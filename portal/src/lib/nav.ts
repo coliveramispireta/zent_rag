@@ -1,6 +1,5 @@
 import {
   Bell,
-  Buildings,
   ChartBar,
   ChartLineUp,
   ChatCircleDots,
@@ -8,10 +7,8 @@ import {
   ClipboardText,
   Code,
   Compass,
-  CreditCard,
   Database,
   Eye,
-  FolderSimple,
   FlowArrow,
   Gear,
   GraduationCap,
@@ -33,7 +30,6 @@ import {
   Swap,
   Target,
   UserCircle,
-  UsersThree,
   WarningOctagon,
   WebhooksLogo,
   Wrench,
@@ -42,7 +38,15 @@ import {
 import type { Session } from "../api";
 import { t } from "./i18n";
 
-export type NavLeaf = { to: string; label: string; icon: Icon; end?: boolean; key?: string };
+export type NavLeaf = {
+  to: string;
+  label: string;
+  icon: Icon;
+  end?: boolean;
+  key?: string;
+  /** Bandera de runtime que debe estar activa para mostrar la entrada. */
+  flag?: string;
+};
 export type NavSection = { heading: string; items: NavLeaf[] };
 export type NavGroup = {
   label: string | null;
@@ -135,11 +139,7 @@ export const NAV_GROUPS: NavGroup[] = [
     collapsible: true,
     defaultCollapsed: true,
     items: [
-      { to: "/team", label: t("nav.tenant.item.team"), icon: UsersThree, key: "users" },
-      { to: "/billing", label: t("nav.tenant.item.billing"), icon: CreditCard, key: "billing" },
       { to: "/settings", label: t("nav.tenant.item.settings"), icon: Gear, key: "settings" },
-      { to: "/workspaces", label: t("nav.tenant.item.workspaces"), icon: Buildings },
-      { to: "/projects", label: t("nav.tenant.item.projects"), icon: FolderSimple },
       { to: "/marketplace", label: t("nav.tenant.item.marketplace"), icon: Storefront },
       { to: "/releases", label: t("nav.tenant.item.releases"), icon: Rocket },
       { to: "/migrations", label: t("nav.tenant.item.migrations"), icon: Swap },

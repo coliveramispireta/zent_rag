@@ -1,6 +1,6 @@
 import { ArrowLeft, Key, ShieldCheck } from "@phosphor-icons/react";
 import { FormEvent, useEffect, useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { usePlatformAuth } from "../../platformAuth";
 import { AuthShell } from "../../components/auth/AuthShell";
@@ -178,14 +178,7 @@ export default function AdminLoginPage() {
           <span className="auth-display__accent">plataforma.</span>
         </>
       }
-      subtitle="Si eres dueño de una organización, entra por el portal de clientes."
-      footer={
-        <div className="text-[13px]">
-          <Link className="auth-link" to="/login">
-            Portal de clientes
-          </Link>
-        </div>
-      }
+      subtitle="Acceso exclusivo del personal de Omnio."
     >
       <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
         <ErrorInline message={error} className="auth-alert mb-0" />

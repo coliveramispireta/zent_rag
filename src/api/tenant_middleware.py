@@ -318,13 +318,22 @@ class TenantMiddleware(BaseHTTPMiddleware):
                                 "message": "X-User-Id must be a valid UUID",
                             },
                         )
-                from src.platform.rbac.repo import get_platform_roles_for_user
+                from src.platform.rbac.repo import (
+                    get_platform_roles_for_user,
+                    get_screen_permissions,
+                )
 
                 platform_roles, platform_permissions = (
                     await get_platform_roles_for_user(session.user_id)
                     if session.user_id is not None
                     else (["read_only"], set())
                 )
+                # Las pantallas asignadas aportan sus permisos de API: el menú
+                # y los endpoints salen de la misma matriz.
+                if session.user_id is not None:
+                    platform_permissions = set(platform_permissions) | (
+                        await get_screen_permissions(session.user_id)
+                    )
                 elevated = bool(
                     set(platform_roles)
                     & {"super_admin", "platform_admin"}
