@@ -195,6 +195,7 @@ export function OrgIngestion({ orgId }: { orgId: string }) {
           <SkeletonBlock rows={4} />
         ) : (
           <DataTable
+            bare
             columns={sourceColumns}
             rows={rows}
             rowKey={(source) => source.id}
@@ -223,6 +224,7 @@ export function OrgIngestion({ orgId }: { orgId: string }) {
           <SkeletonBlock rows={3} />
         ) : (
           <DataTable
+            bare
             columns={collectionColumns}
             rows={collections}
             rowKey={(collection) => collection.id}

@@ -167,6 +167,7 @@ export function OrgAgents({ orgId }: { orgId: string }) {
           <SkeletonBlock rows={4} />
         ) : (
           <DataTable
+            bare
             columns={columns}
             rows={rows}
             rowKey={(agent) => agent.id}

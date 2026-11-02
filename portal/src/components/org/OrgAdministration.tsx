@@ -277,6 +277,7 @@ export function OrgAdministration({ orgId }: { orgId: string }) {
             <Panel>
               <PanelHeader title="Facturas" />
               <DataTable
+                bare
                 columns={invoiceColumns}
                 rows={billing?.invoices ?? []}
                 rowKey={(row) => row.id}
@@ -299,6 +300,7 @@ export function OrgAdministration({ orgId }: { orgId: string }) {
               </div>
             ) : (
               <DataTable
+                bare
                 columns={keyColumns}
                 rows={keys}
                 rowKey={(row) => row.id}
@@ -321,6 +323,7 @@ export function OrgAdministration({ orgId }: { orgId: string }) {
               </div>
             ) : (
               <DataTable
+                bare
                 columns={auditColumns}
                 rows={audit}
                 rowKey={(row) =>

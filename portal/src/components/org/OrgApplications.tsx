@@ -159,6 +159,7 @@ export function OrgApplications({ orgId }: { orgId: string }) {
           <SkeletonBlock rows={4} />
         ) : (
           <DataTable
+            bare
             columns={columns}
             rows={data.applications}
             rowKey={(app) => app.id}
@@ -183,14 +184,6 @@ export function OrgApplications({ orgId }: { orgId: string }) {
         )}
       </Panel>
 
-      {hasDirect && data.applications.length > 0 && (
-        <Panel>
-          <PanelHeader
-            title="Acceso directo"
-            description={`${data.direct_access_keys} clave(s) de esta organización no están asociadas a ninguna aplicación.`}
-          />
-        </Panel>
-      )}
 
       <KeysPanel
         orgId={orgId}
@@ -347,6 +340,7 @@ function KeysPanel({
         <SkeletonBlock rows={3} />
       ) : (
         <DataTable
+          bare
           columns={columns}
           rows={keys}
           rowKey={(key) => key.id}

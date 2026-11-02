@@ -194,6 +194,7 @@ export function OrgConsumption({ orgId }: { orgId: string }) {
               description="Consumo medido por la plataforma en el período. La unidad de negocio (créditos) se define en la Fase 4."
             />
             <DataTable
+              bare
               columns={columns}
               rows={rows}
               rowKey={(row) => row.id}

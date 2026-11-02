@@ -190,7 +190,7 @@ export function OrgParameters({ orgId }: { orgId: string }) {
       {data && (
         <Panel>
           <PanelHeader title="Identidad de la organización" />
-          <dl className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="grid gap-3 p-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <dt className="text-xs text-muted">Nombre</dt>
               <dd className="text-text">{data.name}</dd>
@@ -199,7 +199,11 @@ export function OrgParameters({ orgId }: { orgId: string }) {
               <dt className="text-xs text-muted">Estado</dt>
               <dd>
                 <Badge tone={data.status === "active" ? "ok" : "neutral"}>
-                  {data.status}
+                  {data.status === "active"
+                    ? "Activa"
+                    : data.status === "suspended"
+                      ? "Suspendida"
+                      : data.status}
                 </Badge>
               </dd>
             </div>

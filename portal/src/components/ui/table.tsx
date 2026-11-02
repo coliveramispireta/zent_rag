@@ -42,6 +42,8 @@ export type DataTableProps<T> = {
   empty?: ReactNode;
   dense?: boolean;
   stickyHeader?: boolean;
+  /** Sin contenedor `panel` propio: para usar dentro de un Panel con header. */
+  bare?: boolean;
   onRowClick?: (row: T) => void;
   isRowSelected?: (row: T) => boolean;
   /** Props extra por fila (por ejemplo `data-testid`). */
@@ -69,6 +71,7 @@ export function DataTable<T>({
   empty,
   dense = false,
   stickyHeader = false,
+  bare = false,
   onRowClick,
   isRowSelected,
   rowProps,
@@ -99,13 +102,13 @@ export function DataTable<T>({
       {error ? (
         <ErrorInline message={error} />
       ) : loading ? (
-        <div className="panel overflow-hidden">
+        <div className={bare ? "overflow-hidden" : "panel overflow-hidden"}>
           <SkeletonTable rows={6} cols={Math.min(Array.isArray(columns) ? columns.length : 1, 5)} />
         </div>
       ) : safeRows.length === 0 ? (
-        <div className="panel">{empty}</div>
+        <div className={bare ? undefined : "panel"}>{empty}</div>
       ) : (
-        <div className="panel overflow-x-auto">
+        <div className={bare ? "overflow-x-auto" : "panel overflow-x-auto"}>
           <table className={cn("table", stickyHeader && "table-sticky")}>
             {caption && <caption className="sr-only">{caption}</caption>}
             <thead>
