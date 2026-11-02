@@ -26,6 +26,7 @@ import {
   type SortState,
 } from "../../components/ui";
 import { usePlatformAuth } from "../../platformAuth";
+import { readGrant } from "../../lib/changeGrant";
 
 type Org = {
   id: string;
@@ -225,6 +226,106 @@ export default function AdminCustomersPage() {
     }
   }
 
+  type OrgAction = "edit" | "suspend" | "activate" | "delete";
+
+  const [action, setAction] = useState<OrgAction | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [actionNotice, setActionNotice] = useState("");
+  const [confirmText, setConfirmText] = useState("");
+  const [preview, setPreview] = useState<{
+    organization?: { protected?: boolean; protected_reason?: string };
+  } | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    company_name: "",
+    email: "",
+    ruc: "",
+    phone: "",
+    country: "",
+  });
+
+  function openAction(kind: OrgAction) {
+    if (!peek) return;
+    setAction(kind);
+    setActionError("");
+    setActionNotice("");
+    setConfirmText("");
+    if (kind === "edit") {
+      setEditForm({
+        name: peek.name ?? "",
+        company_name: peek.company_name ?? "",
+        email: peek.email ?? "",
+        ruc: "",
+        phone: "",
+        country: "",
+      });
+    }
+    if (kind === "delete") {
+      setPreview(null);
+      void (async () => {
+        try {
+          setPreview(
+            await platformApi<{
+              organization?: { protected?: boolean; protected_reason?: string };
+            }>(`/api/v1/platform/organizations/${peek.id}/deletion-preview`, { token })
+          );
+        } catch {
+          setPreview({});
+        }
+      })();
+    }
+  }
+
+  async function runAction() {
+    if (!peek || !action) return;
+    setActionBusy(true);
+    setActionError("");
+    try {
+      if (action === "edit") {
+        const grant = readGrant(peek.id);
+        await platformApi(`/api/v1/platform/organizations/${peek.id}`, {
+          method: "PATCH",
+          token,
+          headers: grant ? { "X-Change-Token": grant.token } : undefined,
+          body: JSON.stringify(editForm),
+        });
+        setActionNotice("Datos de la organización actualizados.");
+      } else if (action === "delete") {
+        await platformApi(`/api/v1/platform/organizations/${peek.id}`, {
+          method: "DELETE",
+          token,
+          body: JSON.stringify({ confirmation: confirmText }),
+        });
+        setActionNotice(`Organización eliminada: ${peek.company_name || peek.name}.`);
+        setPeek(null);
+        setPeekData(null);
+      } else {
+        await platformApi(
+          `/api/v1/platform/organizations/${peek.id}/${action}`,
+          { method: "POST", token, body: "{}" }
+        );
+        setActionNotice(
+          action === "suspend"
+            ? "Organización suspendida."
+            : "Organización reactivada."
+        );
+      }
+      setAction(null);
+      await loadOrgs();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "No se pudo completar la acción.";
+      setActionError(
+        message.includes("change_grant_required")
+          ? "Tomá un requerimiento abierto para esta organización antes de editarla."
+          : message
+      );
+    } finally {
+      setActionBusy(false);
+    }
+  }
+
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     const filtered = orgs.filter((o) => {
@@ -315,6 +416,8 @@ export default function AdminCustomersPage() {
           </Button>
         }
       />
+
+      {actionNotice && <p className="mb-3 text-xs text-ok">{actionNotice}</p>}
 
       {created?.organization_id && (
         <p className="mb-3 text-xs text-ok">
@@ -493,13 +596,54 @@ export default function AdminCustomersPage() {
         width={420}
         footer={
           peek && (
-            <ButtonLink
-              variant="primary"
-              size="sm"
-              to={`/control-center/tenants/${peek.id}`}
-            >
-              Ver ficha 360
-            </ButtonLink>
+            <div className="flex w-full flex-col gap-2">
+              <ButtonLink
+                variant="primary"
+                size="sm"
+                to={`/control-center/org/${peek.id}`}
+              >
+                Abrir contexto de la organización
+              </ButtonLink>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => openAction("edit")}
+                >
+                  Editar datos
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => openAction("delete")}
+                >
+                  Eliminar
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="col-span-2"
+                  onClick={() =>
+                    openAction(
+                      (peekData?.subscription_status || peekData?.status) === "suspended"
+                        ? "activate"
+                        : "suspend"
+                    )
+                  }
+                >
+                  {(peekData?.subscription_status || peekData?.status) === "suspended"
+                    ? "Reactivar organización"
+                    : "Suspender organización"}
+                </Button>
+              </div>
+              <ButtonLink
+                variant="ghost"
+                size="sm"
+                to={`/control-center/tenants/${peek.id}`}
+              >
+                Ver ficha 360
+              </ButtonLink>
+            </div>
           )
         }
       >
@@ -535,6 +679,154 @@ export default function AdminCustomersPage() {
           </>
         )}
       </Drawer>
+
+      <Modal
+        open={action === "edit"}
+        onOpenChange={(open) => !open && setAction(null)}
+        title="Editar organización"
+        description="Los cambios quedan auditados. Si sos operador, necesitás un requerimiento tomado."
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setAction(null)}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={actionBusy || editForm.name.trim().length < 2}
+              onClick={() => void runAction()}
+            >
+              {actionBusy ? "Guardando…" : "Guardar"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Nombre interno" className="sm:col-span-2">
+            <Input
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+            />
+          </Field>
+          <Field label="Empresa" className="sm:col-span-2">
+            <Input
+              value={editForm.company_name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, company_name: e.target.value })
+              }
+            />
+          </Field>
+          <Field label="Email">
+            <Input
+              type="email"
+              value={editForm.email}
+              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+            />
+          </Field>
+          <Field label="RUC">
+            <Input
+              value={editForm.ruc}
+              onChange={(e) => setEditForm({ ...editForm, ruc: e.target.value })}
+            />
+          </Field>
+          <Field label="Teléfono">
+            <Input
+              value={editForm.phone}
+              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+            />
+          </Field>
+          <Field label="País">
+            <Input
+              value={editForm.country}
+              onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+            />
+          </Field>
+        </div>
+        {actionError && <ErrorInline message={actionError} className="mt-3" />}
+      </Modal>
+
+      <Modal
+        open={action === "suspend" || action === "activate"}
+        onOpenChange={(open) => !open && setAction(null)}
+        title={action === "suspend" ? "Suspender organización" : "Reactivar organización"}
+        description={peek ? peek.company_name || peek.name : undefined}
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setAction(null)}>
+              Cancelar
+            </Button>
+            <Button disabled={actionBusy} onClick={() => void runAction()}>
+              {actionBusy
+                ? "Procesando…"
+                : action === "suspend"
+                  ? "Suspender"
+                  : "Reactivar"}
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-sm text-muted">
+          {action === "suspend"
+            ? "La organización deja de operar: su suscripción pasa a suspendida y las claves de API quedan bloqueadas."
+            : "La organización vuelve a operar y su suscripción pasa a activa."}
+        </p>
+        {actionError && <ErrorInline message={actionError} className="mt-3" />}
+      </Modal>
+
+      <Modal
+        open={action === "delete"}
+        onOpenChange={(open) => !open && setAction(null)}
+        title="Eliminar organización"
+        description="Borrado definitivo: no se puede deshacer."
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setAction(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              disabled={
+                actionBusy ||
+                confirmText.trim().length === 0 ||
+                preview?.organization?.protected === true
+              }
+              onClick={() => void runAction()}
+            >
+              {actionBusy ? "Eliminando…" : "Eliminar definitivamente"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3 text-sm">
+          <p className="text-muted">
+            Se eliminan permanentemente los agentes, el conocimiento, las claves,
+            el consumo y la auditoría de{" "}
+            <strong className="text-text">
+              {peek ? peek.company_name || peek.name : ""}
+            </strong>
+            . Antes conviene descargar un respaldo.
+          </p>
+          {preview?.organization?.protected && (
+            <ErrorInline
+              message={
+                preview.organization.protected_reason ||
+                "La organización tiene un platform admin como miembro: reasignalo antes de eliminarla."
+              }
+            />
+          )}
+          <Field
+            label={`Escribí «${peek ? peek.company_name || peek.name : ""}» para confirmar`}
+          >
+            <Input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder="Nombre exacto"
+            />
+          </Field>
+          <p className="text-xs text-danger">
+            Debe estar sin requerimientos abiertos y no puede ser tu propia organización.
+          </p>
+        </div>
+        {actionError && <ErrorInline message={actionError} className="mt-3" />}
+      </Modal>
     </div>
   );
 }

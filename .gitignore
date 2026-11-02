@@ -83,3 +83,7 @@ bruno/RAG/prueba.bru
 # Logs
 *.log
 AGENTS.md
+# Respaldos locales
+backup_*.sql
+*.dump
+

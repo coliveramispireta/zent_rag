@@ -158,8 +158,12 @@ class SetUserPasswordBody(BaseModel):
 
 
 class OrganizationContactBody(BaseModel):
+    name: str | None = Field(default=None, min_length=0, max_length=255)
     company_name: str | None = Field(default=None, max_length=200)
     email: str | None = Field(default=None, max_length=320)
+    ruc: str | None = Field(default=None, max_length=20)
+    phone: str | None = Field(default=None, max_length=30)
+    country: str | None = Field(default=None, max_length=100)
 
 
 class EntitlementItem(BaseModel):
@@ -795,13 +799,26 @@ async def update_organization_contact(
 ):
     ctx, oid = await _require_org_ctx(request, org_id, "tenant.write")
     await _require_step_up(request)
+    from src.api.security import require_change_grant
+
+    change_request_id = await require_change_grant(request, oid)
     updates: dict[str, str | None] = {}
-    if body.company_name is not None:
-        value = body.company_name.strip()
-        updates["company_name"] = value or None
-    if body.email is not None:
-        value = body.email.strip().lower()
-        updates["email"] = value or None
+    for column, raw in (
+        ("name", body.name),
+        ("company_name", body.company_name),
+        ("email", body.email),
+        ("ruc", body.ruc),
+        ("phone", body.phone),
+        ("country", body.country),
+    ):
+        if raw is None:
+            continue
+        value = raw.strip()
+        if column == "email":
+            value = value.lower()
+        if column == "name" and not value:
+            raise HTTPException(400, "El nombre no puede quedar vacío")
+        updates[column] = value or None
     if not updates:
         raise HTTPException(400, "No fields to update")
     session = await get_async_session()
@@ -826,7 +843,11 @@ async def update_organization_contact(
         oid,
         organization_id=oid,
         ip_address=_client_ip(request),
-        metadata={"fields": sorted(updates), "actor_user_id": str(ctx.user_id)},
+        metadata={
+            "fields": sorted(updates),
+            "actor_user_id": str(ctx.user_id),
+            "change_request_id": change_request_id,
+        },
     )
     return {"organization_id": str(oid), **updates}
 
@@ -1023,6 +1044,62 @@ async def pause_org(org_id: str, request: Request):
 async def suspend_org(org_id: str, request: Request):
     await _require_step_up(request)
     return await _transition(org_id, request, "suspended", "platform.suspend")
+
+
+@router.post("/organizations/{org_id}/activate", summary="Reactivar organización")
+async def activate_org(org_id: str, request: Request):
+    ctx = require_platform_permission(request, "tenant.suspend")
+    await _require_step_up(request)
+    oid = _parse_org(org_id)
+    session = await get_async_session()
+    try:
+        row = (
+            await session.execute(
+                text(
+                    "UPDATE organizations SET status = 'active', updated_at = NOW() "
+                    "WHERE id = :oid RETURNING id"
+                ),
+                {"oid": oid},
+            )
+        ).fetchone()
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
+    if row is None:
+        raise HTTPException(404, "Organization not found")
+
+    billing_repo = PostgresBillingRepository()
+    sub = await billing_repo.get_subscription_by_organization(oid)
+    subscription_status = None
+    if sub is not None and sub.status in ("suspended", "paused"):
+        from src.infrastructure.postgres.relational_db import PostgresApiKeyRepository
+        from src.platform.billing.service import BillingService
+
+        svc = BillingService(billing_repo, PostgresApiKeyRepository())
+        if await svc.transition_status(sub.id, "active"):
+            subscription_status = "active"
+
+    await _audit().write_or_raise(
+        ctx,
+        "platform.activate",
+        "organization",
+        oid,
+        organization_id=oid,
+        ip_address=_client_ip(request),
+        metadata={
+            "actor_user_id": str(ctx.user_id),
+            "status": "active",
+            "subscription_status": subscription_status,
+        },
+    )
+    return {
+        "status": "active",
+        "organization_id": str(oid),
+        "subscription_status": subscription_status,
+    }
 
 
 @router.post("/organizations/{org_id}/cancel")
@@ -1282,6 +1359,21 @@ async def _transition(org_id: str, request: Request, new_status: str, action: st
     event_type = {"paused": "paused", "suspended": "suspended"}.get(new_status)
     if event_type:
         await _subscription_event(sub, event_type, ctx.user_id)
+        session = await get_async_session()
+        try:
+            await session.execute(
+                text(
+                    "UPDATE organizations SET status = 'suspended', "
+                    "updated_at = NOW() WHERE id = :oid"
+                ),
+                {"oid": oid},
+            )
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
     await _audit().write_or_raise(
         ctx,
         action,
