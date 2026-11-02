@@ -1780,10 +1780,27 @@ class BudgetIn(BaseModel):
     summary="Presupuesto y consumo del período (créditos)",
 )
 async def get_org_budget(org_id: str, request: Request):
-    _, oid = await _require_org_ctx(request, org_id, "tenant.read")
-    from src.platform.consumption.budget import consumption
+    ctx, oid = await _require_org_ctx(request, org_id, "tenant.read")
+    from src.platform.consumption.budget import consumption, mark_alert
 
-    return await consumption(oid)
+    data = await consumption(oid)
+    just_alerted = await mark_alert(oid, data["budget"]["state"])
+    if just_alerted:
+        await _audit().write_or_raise(
+            ctx,
+            "platform.organization_budget_alert",
+            "organization",
+            org_id,
+            ip_address=_client_ip(request),
+            metadata={
+                "state": data["budget"]["state"],
+                "credits_used_pct": data["consumption"]["credits_used_pct"],
+                "credits": data["consumption"]["credits"],
+                "monthly_credits": data["budget"]["monthly_credits"],
+            },
+        )
+    data["budget"]["alert_notified"] = just_alerted
+    return data
 
 
 @router.put(
@@ -1817,6 +1834,53 @@ async def set_org_budget(org_id: str, body: BudgetIn, request: Request):
         },
     )
     return await consumption(oid)
+
+
+@router.get(
+    "/consumption/overview",
+    summary="Consumo del período por organización (créditos)",
+)
+async def consumption_overview(request: Request):
+    require_platform_permission(request, "tenant.read")
+    from src.platform.consumption.budget import overview
+
+    return await overview()
+
+
+class ModelRateIn(BaseModel):
+    input_credits_per_1k: float = Field(..., ge=0)
+    output_credits_per_1k: float = Field(..., ge=0)
+    embedding_credits_per_1k: float = Field(0, ge=0)
+
+
+@router.get("/model-rates", summary="Tarifas de conversión tokens → créditos")
+async def list_model_rates(request: Request):
+    require_platform_permission(request, "tenant.read")
+    from src.platform.consumption.budget import list_rates
+
+    return {"rates": await list_rates()}
+
+
+@router.put("/model-rates/{model}", summary="Actualizar tarifa de un modelo")
+async def put_model_rate(model: str, body: ModelRateIn, request: Request):
+    ctx = require_platform_permission(request, "tenant.write")
+    from src.platform.consumption.budget import upsert_rate
+
+    rate = await upsert_rate(
+        model,
+        body.input_credits_per_1k,
+        body.output_credits_per_1k,
+        body.embedding_credits_per_1k,
+    )
+    await _audit().write_or_raise(
+        ctx,
+        "platform.model_rate_updated",
+        "model_rate",
+        model,
+        ip_address=_client_ip(request),
+        metadata=rate,
+    )
+    return rate
 
 
 # ---------------------------------------------------------------------------

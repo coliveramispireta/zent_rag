@@ -9,6 +9,7 @@ import {
   Skeleton,
 } from "../../components/ui";
 import { usePlatformAuth } from "../../platformAuth";
+import { ConsumptionCredits } from "../../components/admin/ConsumptionCredits";
 
 type Costs = {
   llm: number;
@@ -231,6 +232,8 @@ export default function AdminUsagePage() {
           </section>
         </>
       )}
+
+      <ConsumptionCredits />
     </div>
   );
 }
