@@ -1,5 +1,5 @@
-import { Buildings, MagnifyingGlass } from "@phosphor-icons/react";
-import { useEffect, useMemo, useState } from "react";
+import { Buildings, MagnifyingGlass, Plus } from "@phosphor-icons/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { platformApi } from "../../api";
 import {
@@ -10,12 +10,15 @@ import {
   Drawer,
   EmptyState,
   ErrorInline,
+  Field,
   Input,
   Metric,
   MetricGrid,
+  Modal,
   PageHeader,
   Pagination,
   ResultCount,
+  Select,
   Skeleton,
   StatusBadge,
   cn,
@@ -116,24 +119,88 @@ export default function AdminCustomersPage() {
   const [peekLoading, setPeekLoading] = useState(false);
   const [peekError, setPeekError] = useState("");
 
+  const token = session?.token ?? "";
+
+  const loadOrgs = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const data = await platformApi<{ organizations: Org[] }>(
+        "/api/v1/platform/organizations",
+        { token }
+      );
+      setOrgs(data.organizations || []);
+      setError("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error cargando clientes");
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
   useEffect(() => {
-    if (!session) return;
-    (async () => {
-      setLoading(true);
+    void loadOrgs();
+  }, [loadOrgs]);
+
+  const [creating, setCreating] = useState(false);
+  const [plans, setPlans] = useState<{ name: string; display_name: string }[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [created, setCreated] = useState<{ organization_id?: string } | null>(null);
+  const [form, setForm] = useState({
+    company_name: "",
+    email: "",
+    plan_name: "trial",
+    with_demo: true,
+  });
+
+  async function openCreate() {
+    setCreating(true);
+    setCreateError("");
+    setCreated(null);
+    if (plans.length === 0 && token) {
       try {
-        const data = await platformApi<{ organizations: Org[] }>(
-          "/api/v1/platform/organizations",
-          { token: session.token }
+        const data = await platformApi<{ plans: { name: string; display_name: string }[] }>(
+          "/api/v1/platform/plans",
+          { token }
         );
-        setOrgs(data.organizations || []);
-        setError("");
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error cargando clientes");
-      } finally {
-        setLoading(false);
+        setPlans(data.plans ?? []);
+      } catch {
+        setPlans([]);
       }
-    })();
-  }, [session]);
+    }
+  }
+
+  async function createOrg() {
+    if (!token) return;
+    setSaving(true);
+    setCreateError("");
+    try {
+      const out = await platformApi<{ organization_id?: string }>(
+        "/api/v1/platform/onboarding/provision",
+        {
+          method: "POST",
+          token,
+          body: JSON.stringify({
+            company_name: form.company_name.trim(),
+            email: form.email.trim(),
+            plan_name: form.plan_name,
+            with_demo: form.with_demo,
+          }),
+        }
+      );
+      setCreated(out);
+      setCreating(false);
+      setForm({ company_name: "", email: "", plan_name: "trial", with_demo: true });
+      await loadOrgs();
+    } catch (err) {
+      setCreateError(
+        err instanceof Error ? err.message : "No se pudo crear la organización."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   useEffect(() => {
     setPage(1);
@@ -239,7 +306,94 @@ export default function AdminCustomersPage() {
 
   return (
     <div>
-      <PageHeader title="Clientes" subtitle="Organizaciones de la plataforma." />
+      <PageHeader
+        title="Clientes"
+        subtitle="Organizaciones de la plataforma."
+        actions={
+          <Button leadingIcon={Plus} onClick={() => void openCreate()}>
+            Nueva organización
+          </Button>
+        }
+      />
+
+      {created?.organization_id && (
+        <p className="mb-3 text-xs text-ok">
+          Organización creada.{" "}
+          <Link
+            className="text-accent hover:underline"
+            to={`/control-center/org/${created.organization_id}`}
+          >
+            Abrir contexto de la organización
+          </Link>
+        </p>
+      )}
+
+      <Modal
+        open={creating}
+        onOpenChange={setCreating}
+        title="Nueva organización"
+        description="Crea la organización, su usuario owner, la suscripción y una clave de API."
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setCreating(false)}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={
+                saving || form.company_name.trim().length < 2 || !form.email.includes("@")
+              }
+              onClick={() => void createOrg()}
+            >
+              {saving ? "Creando…" : "Crear organización"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Empresa" className="sm:col-span-2">
+            <Input
+              value={form.company_name}
+              onChange={(e) => setForm({ ...form, company_name: e.target.value })}
+              placeholder="Ej. Miatech"
+            />
+          </Field>
+          <Field label="Email del owner" className="sm:col-span-2">
+            <Input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="owner@empresa.com"
+            />
+          </Field>
+          <Field label="Plan">
+            <Select
+              value={form.plan_name}
+              onChange={(e) => setForm({ ...form, plan_name: e.target.value })}
+            >
+              {plans.length === 0 ? (
+                <option value="trial">trial</option>
+              ) : (
+                plans.map((plan) => (
+                  <option key={plan.name} value={plan.name}>
+                    {plan.display_name || plan.name}
+                  </option>
+                ))
+              )}
+            </Select>
+          </Field>
+          <Field label="Datos de ejemplo">
+            <label className="flex h-9 items-center gap-2 text-sm text-text">
+              <input
+                type="checkbox"
+                checked={form.with_demo}
+                onChange={(e) => setForm({ ...form, with_demo: e.target.checked })}
+              />
+              Crear agente y datos de demo
+            </label>
+          </Field>
+        </div>
+        {createError && <ErrorInline message={createError} className="mt-3" />}
+      </Modal>
       <DataTable
         columns={columns}
         rows={paged}
