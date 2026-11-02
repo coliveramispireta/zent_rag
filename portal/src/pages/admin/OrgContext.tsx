@@ -245,7 +245,7 @@ export default function OrgContext() {
               title="Contexto de la organización"
               description="Nivel 2 del menú: aquí se administra esta organización sin cambiar de sesión."
             />
-            <dl className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+            <dl className="grid gap-3 p-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <dt className="text-xs text-muted">Plan</dt>
                 <dd className="text-text">{org?.plan ?? "—"}</dd>
@@ -296,7 +296,7 @@ export default function OrgContext() {
             title="Configuración de IA de la organización"
             description="Estas capacidades se configuran por organización. Se abren aquí mismo, sin salir del contexto."
           />
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
             {AI_LINKS.map((link) => (
               <ButtonLink
                 key={link.slug}

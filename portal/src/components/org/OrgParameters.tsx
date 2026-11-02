@@ -137,7 +137,7 @@ export function OrgParameters({ orgId }: { orgId: string }) {
           title="Límites de uso"
           description="Valores con los que Zent atiende a esta organización. Aplican a su API y a sus agentes."
         />
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 px-4 pt-4 sm:grid-cols-2">
           <Field label="Solicitudes por minuto" hint="1 a 1.000.000">
             <Input
               type="number"
@@ -177,7 +177,7 @@ export function OrgParameters({ orgId }: { orgId: string }) {
             />
           </Field>
         </div>
-        <div className="mt-3 flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 px-4 pb-4 pt-3">
           <Button onClick={() => void save()} disabled={saving || invalid}>
             {saving ? "Guardando…" : "Guardar parámetros"}
           </Button>

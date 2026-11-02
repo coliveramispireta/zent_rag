@@ -140,7 +140,7 @@ export function OrgAgents({ orgId }: { orgId: string }) {
           description="Alta, configuración y pausa de agentes. Hoy la vista es de solo lectura: la administración se habilita cuando exista el endpoint por organización."
         />
 
-        <div className="mb-3 flex flex-wrap items-end gap-2">
+        <div className="flex flex-wrap items-end gap-2 px-4 pb-3 pt-4">
           <Input
             type="search"
             value={query}

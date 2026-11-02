@@ -176,7 +176,7 @@ export function OrgIngestion({ orgId }: { orgId: string }) {
           description="El operador supervisa la ingesta; reingestar o cargar archivos se hace desde la app del cliente."
         />
 
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 px-4 pb-3 pt-4">
           <Input
             type="search"
             value={query}
