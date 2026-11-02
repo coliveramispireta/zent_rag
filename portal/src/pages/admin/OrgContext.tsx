@@ -14,6 +14,7 @@ import {
   SkeletonBlock,
 } from "../../components/ui";
 import { OrgAgents } from "../../components/org/OrgAgents";
+import ErrorBoundary from "../../components/ErrorBoundary";
 import { ChangeGrantBar } from "../../components/org/ChangeGrantBar";
 import { OrgApplications } from "../../components/org/OrgApplications";
 import { OrgIngestion } from "../../components/org/OrgIngestion";
@@ -53,6 +54,10 @@ const AI_LINKS = [
   { to: "/control-center/metering", label: "Medición" },
   { to: "/control-center/cost-governance", label: "Gobierno de costos" },
   { to: "/control-center/optimizer", label: "Optimizador" },
+  { to: "/control-center/workflows", label: "Flujos de trabajo" },
+  { to: "/control-center/copilot", label: "Copiloto" },
+  { to: "/control-center/feedback", label: "Retroalimentación" },
+  { to: "/control-center/chat-insights", label: "Insights de chat" },
 ];
 
 export default function OrgContext() {
@@ -193,6 +198,7 @@ export default function OrgContext() {
       {error && <ErrorInline message={error} />}
       {loading ? <SkeletonBlock rows={4} /> : null}
 
+      <ErrorBoundary>
       {!loading && section === "resumen" && (
         <>
           <MetricGrid>
@@ -292,6 +298,7 @@ export default function OrgContext() {
           }
         />
       )}
+      </ErrorBoundary>
     </div>
   );
 }

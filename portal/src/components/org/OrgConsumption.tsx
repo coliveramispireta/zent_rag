@@ -19,9 +19,9 @@ type FinopsOrg = {
   period?: { from?: string; to?: string };
   revenue_cents: number;
   mrr_cents: number;
-  costs: { llm: number; embedding: number; storage: number; infra: number };
+  costs?: { llm: number; embedding: number; storage: number; infra: number };
   gross_profit: number;
-  gross_margin_pct: number;
+  gross_margin_pct: number | null;
   economics?: {
     requests: number;
     cost_per_request: number | null;
@@ -94,16 +94,19 @@ export function OrgConsumption({ orgId }: { orgId: string }) {
   const totalCost = useMemo(() => {
     if (!data) return 0;
     return (
-      data.costs.llm + data.costs.embedding + data.costs.storage + data.costs.infra
+      (data.costs?.llm ?? 0) +
+      (data.costs?.embedding ?? 0) +
+      (data.costs?.storage ?? 0) +
+      (data.costs?.infra ?? 0)
     );
   }, [data]);
 
   const rows: CostRow[] = useMemo(
     () => [
-      { id: "llm", label: "LLM", amount: data?.costs.llm ?? 0 },
-      { id: "embedding", label: "Embeddings", amount: data?.costs.embedding ?? 0 },
-      { id: "storage", label: "Almacenamiento", amount: data?.costs.storage ?? 0 },
-      { id: "infra", label: "Infraestructura", amount: data?.costs.infra ?? 0 },
+      { id: "llm", label: "LLM", amount: data?.costs?.llm ?? 0 },
+      { id: "embedding", label: "Embeddings", amount: data?.costs?.embedding ?? 0 },
+      { id: "storage", label: "Almacenamiento", amount: data?.costs?.storage ?? 0 },
+      { id: "infra", label: "Infraestructura", amount: data?.costs?.infra ?? 0 },
     ],
     [data],
   );
@@ -164,12 +167,16 @@ export function OrgConsumption({ orgId }: { orgId: string }) {
           <MetricGrid>
             <Metric label="Solicitudes" value={(data.economics?.requests ?? 0).toLocaleString()} />
             <Metric label="Costo total" value={fmtCurrency(totalCost, 4)} />
-            <Metric label="Costo de IA" value={fmtCurrency(data.costs.llm, 4)} />
-            <Metric label="Ingresos" value={fmtCurrencyCents(data.revenue_cents)} />
+            <Metric label="Costo de IA" value={fmtCurrency(data.costs?.llm ?? 0, 4)} />
+            <Metric label="Ingresos" value={fmtCurrencyCents(data.revenue_cents ?? 0)} />
             <Metric
               label="Margen bruto"
-              value={fmtCurrency(data.gross_profit, 2)}
-              hint={`${data.gross_margin_pct.toFixed(1)}%`}
+              value={fmtCurrency(data.gross_profit ?? 0, 2)}
+              hint={
+                data.gross_margin_pct != null
+                  ? `${data.gross_margin_pct.toFixed(1)}%`
+                  : "sin ingresos en el período"
+              }
             />
             <Metric
               label="Costo por solicitud"
