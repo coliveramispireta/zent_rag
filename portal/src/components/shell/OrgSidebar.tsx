@@ -1,4 +1,5 @@
 import {
+  Buildings,
   ChartLineUp,
   Cpu,
   Database,
@@ -20,6 +21,7 @@ const ICONS: Record<OrgSectionId, Icon> = {
   parametros: Gear,
   ingesta: Database,
   consumo: ChartLineUp,
+  administracion: Buildings,
 };
 
 /**
@@ -84,10 +86,10 @@ export function OrgSidebar({
           <span aria-hidden>‹</span> Salir a Zent
         </NavLink>
         <NavLink
-          to={`/control-center/tenants/${orgId}`}
+          to={`/control-center/org/${orgId}?seccion=administracion`}
           className="mt-2 flex items-center gap-2 text-xs text-muted transition-colors hover:text-text"
         >
-          Ficha 360 de la organización
+          Administración de la organización
         </NavLink>
       </div>
     </div>

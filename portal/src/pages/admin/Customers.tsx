@@ -1,6 +1,6 @@
 import { Buildings, MagnifyingGlass, Plus } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { platformApi } from "../../api";
 import {
   Badge,
@@ -120,6 +120,7 @@ export default function AdminCustomersPage() {
   const [peekLoading, setPeekLoading] = useState(false);
   const [peekError, setPeekError] = useState("");
 
+  const navigate = useNavigate();
   const token = session?.token ?? "";
 
   const loadOrgs = useCallback(async () => {
@@ -349,13 +350,30 @@ export default function AdminCustomersPage() {
 
   const columns: Column<Org>[] = [
     {
+      key: "actions",
+      header: "",
+      align: "right",
+      render: (o) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(event) => {
+            event.stopPropagation();
+            void openPeek(o);
+          }}
+        >
+          Acciones
+        </Button>
+      ),
+    },
+    {
       key: "name",
       header: "Empresa",
       sortable: true,
       render: (o) => (
         <Link
           className="font-medium text-accent hover:underline"
-          to={`/control-center/tenants/${o.id}`}
+          to={`/control-center/org/${o.id}`}
           onClick={(e) => e.stopPropagation()}
         >
           {o.company_name || o.name}
@@ -457,7 +475,7 @@ export default function AdminCustomersPage() {
             <Input
               value={form.company_name}
               onChange={(e) => setForm({ ...form, company_name: e.target.value })}
-              placeholder="Ej. Miatech"
+              placeholder="Ej. Acme"
             />
           </Field>
           <Field label="Email del owner" className="sm:col-span-2">
@@ -534,7 +552,7 @@ export default function AdminCustomersPage() {
         sort={sort}
         onSortChange={setSort}
         stickyHeader
-        onRowClick={(o) => void openPeek(o)}
+        onRowClick={(o) => navigate(`/control-center/org/${o.id}`)}
         toolbar={
           <>
             <Input
@@ -636,13 +654,6 @@ export default function AdminCustomersPage() {
                     : "Suspender organización"}
                 </Button>
               </div>
-              <ButtonLink
-                variant="ghost"
-                size="sm"
-                to={`/control-center/tenants/${peek.id}`}
-              >
-                Ver ficha 360
-              </ButtonLink>
             </div>
           )
         }

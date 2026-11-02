@@ -13,6 +13,7 @@ export const ORG_SECTIONS = [
   { id: "parametros", label: "Parámetros" },
   { id: "ingesta", label: "Ingesta de información" },
   { id: "consumo", label: "Monitoreo de consumo" },
+  { id: "administracion", label: "Administración" },
 ] as const;
 
 export type OrgSectionId = (typeof ORG_SECTIONS)[number]["id"];

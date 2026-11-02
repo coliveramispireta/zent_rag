@@ -153,10 +153,24 @@ type DeletePreview = {
 const TABS = ["Overview", "Timeline", "Users", "Agents", "Data Sources", "Costs", "Billing", "Security", "Audit"] as const;
 type Tab = (typeof TABS)[number];
 
+/**
+ * Dentro del contexto de la organización estas pestañas sobran: los usuarios de
+ * la aplicación no se gestionan desde Zent y agentes, fuentes y consumo ya
+ * tienen su sección propia en el Nivel 2.
+ */
+const EMBEDDED_HIDDEN: readonly Tab[] = ["Users", "Agents", "Data Sources", "Costs"];
+
 const ACTIONS = ["pause", "suspend", "cancel", "reset"] as const;
 
-export default function AdminCustomerDetailPage() {
+export default function AdminCustomerDetailPage({
+  embedded = false,
+}: {
+  embedded?: boolean;
+}) {
   const { orgId } = useParams();
+  const visibleTabs = embedded
+    ? TABS.filter((item) => !EMBEDDED_HIDDEN.includes(item))
+    : TABS;
   const navigate = useNavigate();
   const { session } = usePlatformAuth();
   const [tab, setTab] = useState<Tab>("Overview");
@@ -845,7 +859,7 @@ export default function AdminCustomerDetailPage() {
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)} className="mb-4">
         <TabsList>
-          {TABS.map((t) => (
+          {visibleTabs.map((t) => (
             <TabsTrigger key={t} value={t}>
               {t}
             </TabsTrigger>

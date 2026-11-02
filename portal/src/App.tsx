@@ -1,7 +1,14 @@
 import { MagnifyingGlass, List } from "@phosphor-icons/react";
 import { motion, useAnimation, useReducedMotion } from "motion/react";
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import {
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ApiKeyCreatedModal } from "./components/ApiKeyCreatedModal";
 import { Topbar } from "./components/Topbar";
@@ -92,7 +99,14 @@ const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminLoginPage = lazy(() => import("./pages/admin/Login"));
 const AdminDashboardPage = lazy(() => import("./pages/admin/Dashboard"));
 const AdminCustomersPage = lazy(() => import("./pages/admin/Customers"));
-const AdminCustomerDetailPage = lazy(() => import("./pages/admin/CustomerDetail"));
+/**
+ * Toda organización se administra dentro de su contexto: la ruta antigua de
+ * ficha redirige al Nivel 2 en lugar de mostrar una página fuera del contexto.
+ */
+function TenantOrgRedirect() {
+  const { orgId = "" } = useParams<{ orgId: string }>();
+  return <Navigate to={`/control-center/org/${orgId}`} replace />;
+}
 const AdminPlansPage = lazy(() => import("./pages/admin/Plans"));
 const AdminUsagePage = lazy(() => import("./pages/admin/Usage"));
 const AdminSubscriptionsPage = lazy(() => import("./pages/admin/Subscriptions"));
@@ -510,7 +524,7 @@ export default function App() {
       >
         <Route index element={<Suspense fallback={<PageFallback />}><AdminDashboardPage /></Suspense>} />
         <Route path="tenants" element={<Suspense fallback={<PageFallback />}><AdminCustomersPage /></Suspense>} />
-        <Route path="tenants/:orgId" element={<Suspense fallback={<PageFallback />}><AdminCustomerDetailPage /></Suspense>} />
+        <Route path="tenants/:orgId" element={<TenantOrgRedirect />} />
         <Route path="subscriptions" element={<Suspense fallback={<PageFallback />}><AdminSubscriptionsPage /></Suspense>} />
         <Route path="usage" element={<Suspense fallback={<PageFallback />}><AdminUsagePage /></Suspense>} />
         <Route path="costs" element={<Suspense fallback={<PageFallback />}><AdminFinOpsPage /></Suspense>} />

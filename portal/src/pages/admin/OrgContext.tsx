@@ -1,5 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentType,
+  type LazyExoticComponent,
+} from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import CustomerDetail from "./CustomerDetail";
 import { platformApi } from "../../api";
 import { usePlatformAuth } from "../../platformAuth";
 import {
@@ -42,29 +51,60 @@ type Counts = { users: number; agents: number; sources: number };
 
 const EMPTY_COUNTS: Counts = { users: 0, agents: 0, sources: 0 };
 
-/** Capacidades de IA que pertenecen al contexto de la organización. */
-const AI_LINKS = [
-  { to: "/control-center/model-gateway", label: "Gateway de modelos" },
-  { to: "/control-center/decision-engine", label: "Motor de decisión" },
-  { to: "/control-center/ai-runtime", label: "Runtime de IA" },
-  { to: "/control-center/inference-proxy", label: "Inferencia" },
-  { to: "/control-center/evals", label: "Evaluaciones" },
-  { to: "/control-center/traces", label: "Trazas" },
-  { to: "/control-center/model-health", label: "Salud de modelos" },
-  { to: "/control-center/metering", label: "Medición" },
-  { to: "/control-center/cost-governance", label: "Gobierno de costos" },
-  { to: "/control-center/optimizer", label: "Optimizador" },
-  { to: "/control-center/workflows", label: "Flujos de trabajo" },
-  { to: "/control-center/copilot", label: "Copiloto" },
-  { to: "/control-center/feedback", label: "Retroalimentación" },
-  { to: "/control-center/chat-insights", label: "Insights de chat" },
-];
+/**
+ * Capacidades de IA del contexto. Se abren dentro del propio contexto
+ * (`?seccion=ia&vista=<slug>`) para no perder el segundo sidebar.
+ */
+const AI_VIEWS: Record<
+  string,
+  { label: string; Page: LazyExoticComponent<ComponentType> }
+> = {
+  "model-gateway": {
+    label: "Gateway de modelos",
+    Page: lazy(() => import("./ModelGateway")),
+  },
+  "decision-engine": {
+    label: "Motor de decisión",
+    Page: lazy(() => import("./DecisionEngine")),
+  },
+  "ai-runtime": { label: "Runtime de IA", Page: lazy(() => import("./Runtime")) },
+  "inference-proxy": {
+    label: "Inferencia",
+    Page: lazy(() => import("./InferenceProxy")),
+  },
+  evals: { label: "Evaluaciones", Page: lazy(() => import("./EvalsLab")) },
+  traces: { label: "Trazas", Page: lazy(() => import("./Traces")) },
+  "model-health": {
+    label: "Salud de modelos",
+    Page: lazy(() => import("./ModelHealth")),
+  },
+  metering: { label: "Medición", Page: lazy(() => import("./Metering")) },
+  "cost-governance": {
+    label: "Gobierno de costos",
+    Page: lazy(() => import("./CostGovernance")),
+  },
+  optimizer: { label: "Optimizador", Page: lazy(() => import("./Optimizer")) },
+  workflows: { label: "Flujos de trabajo", Page: lazy(() => import("./Workflows")) },
+  copilot: { label: "Copiloto", Page: lazy(() => import("./Copilot")) },
+  feedback: { label: "Retroalimentación", Page: lazy(() => import("./Feedback")) },
+  "chat-insights": {
+    label: "Insights de chat",
+    Page: lazy(() => import("./ChatInsights")),
+  },
+};
+
+const AI_LINKS = Object.entries(AI_VIEWS).map(([slug, item]) => ({
+  slug,
+  label: item.label,
+}));
 
 export default function OrgContext() {
   const { orgId = "" } = useParams<{ orgId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { session } = usePlatformAuth();
   const section = parseOrgSection(searchParams.get("seccion"));
+  const aiVista = searchParams.get("vista");
+  const aiView = aiVista ? AI_VIEWS[aiVista] : undefined;
 
   const [org, setOrg] = useState<OrgDetail | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
@@ -231,6 +271,10 @@ export default function OrgContext() {
                 <dd className="text-text">{accessOrigin}</dd>
               </div>
               <div>
+                <dt className="text-xs text-muted">Usuario de la aplicación</dt>
+                <dd className="text-text">{org?.email ?? "—"}</dd>
+              </div>
+              <div>
                 <dt className="text-xs text-muted">Organización</dt>
                 <dd className="mono text-xs text-muted">{orgId}</dd>
               </div>
@@ -247,6 +291,8 @@ export default function OrgContext() {
 
       {!loading && section === "parametros" && <OrgParameters orgId={orgId} />}
 
+      {!loading && section === "administracion" && <CustomerDetail embedded />}
+
       {!loading && section === "consumo" && (
         <div className="space-y-6">
           <OrgBudget orgId={orgId} />
@@ -254,17 +300,17 @@ export default function OrgContext() {
         </div>
       )}
 
-      {!loading && section === "ia" && (
+      {!loading && section === "ia" && !aiView && (
         <Panel>
           <PanelHeader
             title="Configuración de IA de la organización"
-            description="Estas capacidades se configuran por organización. Por ahora abren la vista global de plataforma, hasta que tengan alcance propio por organización."
+            description="Estas capacidades se configuran por organización. Se abren aquí mismo, sin salir del contexto."
           />
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {AI_LINKS.map((link) => (
               <ButtonLink
-                key={link.to}
-                to={link.to}
+                key={link.slug}
+                to={`/control-center/org/${orgId}?seccion=ia&vista=${link.slug}`}
                 variant="secondary"
                 size="sm"
               >
@@ -273,6 +319,27 @@ export default function OrgContext() {
             ))}
           </div>
         </Panel>
+      )}
+
+      {!loading && section === "ia" && aiView && aiVista && (
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-soft px-3 py-2">
+            <span className="text-xs text-muted">
+              {aiView.label} · vista global de plataforma. El alcance por
+              organización llega en la próxima etapa.
+            </span>
+            <ButtonLink
+              to={`/control-center/org/${orgId}?seccion=ia`}
+              variant="ghost"
+              size="sm"
+            >
+              ‹ Todas las capacidades
+            </ButtonLink>
+          </div>
+          <Suspense fallback={<SkeletonBlock rows={4} />}>
+            <aiView.Page />
+          </Suspense>
+        </div>
       )}
 
       {!loading &&
@@ -286,16 +353,7 @@ export default function OrgContext() {
         <EmptyState
           title={`${current?.label ?? "Sección"} — en preparación`}
           body="Esta sección del Nivel 2 se construye en la siguiente etapa de la reorganización."
-          hint="Mientras tanto, la ficha completa de la organización muestra el detalle disponible hoy."
-          action={
-            <ButtonLink
-              to={`/control-center/tenants/${orgId}`}
-              variant="secondary"
-              size="sm"
-            >
-              Ver ficha completa
-            </ButtonLink>
-          }
+          hint="Mientras tanto, todo lo disponible de la organización está en las demás secciones de este menú."
         />
       )}
       </ErrorBoundary>
