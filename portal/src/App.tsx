@@ -103,6 +103,7 @@ const AdminSettingsPage = lazy(() => import("./pages/admin/Settings"));
 const AdminStaffPage = lazy(() => import("./pages/admin/Staff"));
 const AdminOrgContextPage = lazy(() => import("./pages/admin/OrgContext"));
 const AdminApplicationsPage = lazy(() => import("./pages/admin/Applications"));
+const AdminChangeRequestsPage = lazy(() => import("./pages/admin/ChangeRequests"));
 const AdminFinOpsPage = lazy(() => import("./pages/admin/FinOps"));
 const AdminSystemStatusPage = lazy(() => import("./pages/admin/SystemStatus"));
 const SsoCallbackPage = lazy(() => import("./pages/SsoCallback"));
@@ -553,6 +554,7 @@ export default function App() {
         <Route path="security" element={<Suspense fallback={<PageFallback />}><AdminSecurityPage /></Suspense>} />
         <Route path="audit" element={<Suspense fallback={<PageFallback />}><AdminAuditPage /></Suspense>} />
         <Route path="applications" element={<Suspense fallback={<PageFallback />}><AdminApplicationsPage /></Suspense>} />
+        <Route path="change-requests" element={<Suspense fallback={<PageFallback />}><AdminChangeRequestsPage /></Suspense>} />
         <Route path="org/:orgId" element={<Suspense fallback={<PageFallback />}><AdminOrgContextPage /></Suspense>} />
         <Route path="staff" element={<Suspense fallback={<PageFallback />}><AdminStaffPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<PageFallback />}><AdminSettingsPage /></Suspense>} />

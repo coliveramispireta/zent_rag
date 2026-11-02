@@ -50,6 +50,7 @@ export const PLATFORM_NAV: PlatformNavGroup[] = [
       { to: `${BASE}`, label: t("nav.item.overview"), icon: Gauge, end: true },
       { to: `${BASE}/tenants`, label: t("nav.item.tenants"), icon: Buildings, permission: "tenant.read" },
       { to: `${BASE}/applications`, label: t("nav.item.applications"), icon: Plugs, permission: "tenant.read" },
+      { to: `${BASE}/change-requests`, label: t("nav.item.changeRequests"), icon: Scroll, permission: "tenant.read" },
       { to: `${BASE}/customers`, label: t("nav.item.customers"), icon: UsersThree },
       { to: `${BASE}/subscriptions`, label: t("nav.item.subscriptions"), icon: Cards },
       { to: `${BASE}/revenue`, label: t("nav.item.revenue"), icon: TrendUp },

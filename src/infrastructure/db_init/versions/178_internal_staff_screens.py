@@ -78,7 +78,7 @@ _SCREENS: list[tuple[str, str, str, str, int]] = [
 
 _MOCK_STAFF: list[tuple[str, str, bool]] = [
     ("admin@omnio.pe", "$2b$12$xrRr5k6SkRj6Ur49yjhlseOGCQElJ4NFsfUfUrACzZRZeWRSxGunK", True),
-    ("coliver@omnio.pe", "$2b$12$EZNDR8jGp5wI09byoO6FqekfcwWnO7YU/K//59rHAQ6VVPAefUEIO", False),
+    ("colivera@omnio.pe", "$2b$12$EZNDR8jGp5wI09byoO6FqekfcwWnO7YU/K//59rHAQ6VVPAefUEIO", False),
     ("ppimentel@omnio.pe", "$2b$12$HeWM5w2wjEPHjfTW.uNnX.HskjoTktWCTyvaAg3CZpfAlDl9RGt/m", False),
     ("creyes@omnio.pe", "$2b$12$ITD2ErptnFMuE5Yyn8deM.lH/f8y2ViHjvM/BaRDq5M..jrJwYm6a", False),
     ("mcamacho@omnio.pe", "$2b$12$QX0XWQruY3IJ0OrSXnjOc.64BQtLO/zHLGdcSPPql5hDgyYQ/9KAe", False),

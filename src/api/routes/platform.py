@@ -1592,6 +1592,25 @@ async def set_key_application_route(
         except ValueError:
             raise HTTPException(400, "application_id must be a valid UUID")
 
+    # La escritura exige un requerimiento tomado sobre la organización de la clave.
+    from src.api.security import require_change_grant
+
+    lookup = await get_async_session()
+    try:
+        key_row = (
+            await lookup.execute(
+                text("SELECT organization_id FROM api_keys WHERE id = :kid"),
+                {"kid": kid},
+            )
+        ).fetchone()
+    finally:
+        await lookup.close()
+    if key_row is None:
+        raise HTTPException(404, "API key not found")
+    change_request_id = await require_change_grant(
+        request, key_row.organization_id
+    )
+
     session = await get_async_session()
     try:
         row = (
@@ -1618,7 +1637,10 @@ async def set_key_application_route(
         "api_key",
         key_id,
         ip_address=_client_ip(request),
-        metadata={"application_id": str(app_id) if app_id else None},
+        metadata={
+            "application_id": str(app_id) if app_id else None,
+            "change_request_id": change_request_id,
+        },
     )
     return {
         "id": str(row.id),
@@ -1700,6 +1722,9 @@ async def set_org_parameters(
     org_id: str, body: OrgParametersIn, request: Request
 ):
     ctx, oid = await _require_org_ctx(request, org_id, "tenant.write")
+    from src.api.security import require_change_grant
+
+    change_request_id = await require_change_grant(request, oid)
     session = await get_async_session()
     try:
         await session.execute(
@@ -1735,12 +1760,111 @@ async def set_org_parameters(
         metadata={
             "rate_limit_per_minute": body.rate_limit_per_minute,
             "max_tokens_per_request": body.max_tokens_per_request,
+            "change_request_id": change_request_id,
         },
     )
     params = await _read_org_parameters(oid)
     if params is None:
         raise HTTPException(404, "Organization not found")
     return params
+
+
+# ---------------------------------------------------------------------------
+# Requerimientos de cambio — sustento auditable de la configuración
+# ---------------------------------------------------------------------------
+
+
+class ChangeRequestIn(BaseModel):
+    organization_id: str
+    kind: str = Field("other", max_length=30)
+    title: str = Field(..., min_length=3, max_length=200)
+    description: str = Field(..., min_length=10)
+
+
+class ChangeResolveIn(BaseModel):
+    note: str = Field(..., min_length=5, max_length=1000)
+
+
+@router.get("/change-requests", summary="Requerimientos de cambio")
+async def list_change_requests_route(
+    request: Request, organization_id: str | None = None
+):
+    require_platform_permission(request, "tenant.read")
+    from src.platform.change_requests.service import list_requests
+
+    oid = _parse_org(organization_id) if organization_id else None
+    items = await list_requests(oid)
+    return {"requests": items, "count": len(items)}
+
+
+@router.post("/change-requests", status_code=201, summary="Abrir requerimiento")
+async def open_change_request_route(body: ChangeRequestIn, request: Request):
+    ctx = require_platform_permission(request, "tenant.read")
+    from src.platform.change_requests.service import open_request
+
+    created = await open_request(
+        organization_id=_parse_org(body.organization_id),
+        title=body.title.strip(),
+        description=body.description.strip(),
+        kind=body.kind,
+        opened_by=ctx.user_id,
+    )
+    return created
+
+
+@router.post("/change-requests/{request_id}/take", summary="Tomar requerimiento")
+async def take_change_request_route(request_id: str, request: Request):
+    ctx = require_platform_permission(request, "tenant.read")
+    from src.platform.change_requests.service import take_request
+
+    try:
+        rid = UUID(request_id)
+    except ValueError:
+        raise HTTPException(400, "request_id must be a valid UUID")
+    out = await take_request(rid, ctx.user_id)
+    if out is None:
+        raise HTTPException(409, "El requerimiento no está disponible")
+    return out
+
+
+@router.post(
+    "/change-requests/{request_id}/release", summary="Liberar requerimiento"
+)
+async def release_change_request_route(request_id: str, request: Request):
+    require_platform_permission(request, "tenant.read")
+    from src.platform.change_requests.service import release_request
+
+    try:
+        rid = UUID(request_id)
+    except ValueError:
+        raise HTTPException(400, "request_id must be a valid UUID")
+    if not await release_request(rid):
+        raise HTTPException(409, "El requerimiento no está tomado")
+    return {"id": request_id, "status": "open"}
+
+
+@router.post(
+    "/change-requests/{request_id}/resolve", summary="Resolver requerimiento"
+)
+async def resolve_change_request_route(
+    request_id: str, body: ChangeResolveIn, request: Request
+):
+    ctx = require_platform_permission(request, "tenant.read")
+    from src.platform.change_requests.service import get_request, resolve_request
+
+    try:
+        rid = UUID(request_id)
+    except ValueError:
+        raise HTTPException(400, "request_id must be a valid UUID")
+    current = await get_request(rid)
+    if current is None:
+        raise HTTPException(404, "Requerimiento no encontrado")
+    is_super = "super_admin" in set(getattr(ctx, "roles", frozenset()) or frozenset())
+    if not is_super and current["taken_by"] != str(ctx.user_id):
+        raise HTTPException(403, "Solo quien tomó el requerimiento puede resolverlo")
+    if not await resolve_request(rid, ctx.user_id, body.note.strip()):
+        raise HTTPException(409, "El requerimiento no está tomado")
+    return {"id": request_id, "status": "resolved"}
 
 
 # ---------------------------------------------------------------------------

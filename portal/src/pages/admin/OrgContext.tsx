@@ -14,6 +14,7 @@ import {
   SkeletonBlock,
 } from "../../components/ui";
 import { OrgAgents } from "../../components/org/OrgAgents";
+import { ChangeGrantBar } from "../../components/org/ChangeGrantBar";
 import { OrgApplications } from "../../components/org/OrgApplications";
 import { OrgIngestion } from "../../components/org/OrgIngestion";
 import { OrgConsumption } from "../../components/org/OrgConsumption";
@@ -151,6 +152,8 @@ export default function OrgContext() {
 
   return (
     <div className="space-y-6">
+      <ChangeGrantBar orgId={orgId} />
+
       <PageHeader
         title={title}
         subtitle={org?.email ?? undefined}

@@ -66,6 +66,34 @@ def get_billing_context(request: Request):
     return ctx
 
 
+async def require_change_grant(
+    request: Request, organization_id: UUID, scope: str = "tenant.write"
+) -> str | None:
+    """Exige un requerimiento tomado para escribir configuración.
+
+    El superadmin queda exento (sus cambios igual se auditan). Devuelve el id
+    del requerimiento para poder registrarlo en la auditoría.
+    """
+    ctx = get_auth_context(request)
+    roles = set(getattr(ctx, "roles", frozenset()) or frozenset())
+    if "super_admin" in roles or "admin:*" in set(getattr(ctx, "scopes", frozenset()) or frozenset()):
+        return None
+
+    from src.platform.change_requests.service import validate_grant
+
+    token = request.headers.get("X-Change-Token", "")
+    request_id = await validate_grant(token, organization_id)
+    if request_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "error_code": "change_grant_required",
+                "message": "Necesitás tomar un requerimiento para modificar la configuración.",
+            },
+        )
+    return request_id
+
+
 def _parse_uuid(value: str, label: str) -> UUID:
     try:
         return UUID(value)

@@ -12,6 +12,7 @@ import {
   SkeletonBlock,
 } from "../../components/ui";
 import { fmtDateTime } from "../../lib/format";
+import { readGrant } from "../../lib/changeGrant";
 
 type OrgParameters = {
   id: string;
@@ -83,11 +84,13 @@ export function OrgParameters({ orgId }: { orgId: string }) {
     setError("");
     setNotice("");
     try {
+      const grant = readGrant(orgId);
       const updated = await platformApi<OrgParameters>(
         `/api/v1/platform/organizations/${orgId}/parameters`,
         {
           method: "PUT",
           token: session.token,
+          headers: grant ? { "X-Change-Token": grant.token } : undefined,
           body: JSON.stringify({
             rate_limit_per_minute: Number(form.rate_limit_per_minute),
             max_tokens_per_request: Number(form.max_tokens_per_request),
@@ -99,7 +102,12 @@ export function OrgParameters({ orgId }: { orgId: string }) {
       setData(updated);
       setNotice("Parámetros guardados.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudieron guardar los parámetros.");
+      const message = e instanceof Error ? e.message : "";
+      setError(
+        message.includes("change_grant_required")
+          ? "Tomá un requerimiento abierto para modificar la configuración de esta organización."
+          : message || "No se pudieron guardar los parámetros.",
+      );
     } finally {
       setSaving(false);
     }

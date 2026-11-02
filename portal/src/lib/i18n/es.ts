@@ -21,6 +21,7 @@ export const es = {
   "nav.item.overview": "Resumen",
   "nav.item.tenants": "Organizaciones",
   "nav.item.applications": "Aplicaciones",
+  "nav.item.changeRequests": "Requerimientos",
   "nav.item.customers": "Clientes",
   "nav.item.subscriptions": "Suscripciones",
   "nav.item.revenue": "Ingresos",
