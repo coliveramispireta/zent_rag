@@ -1769,6 +1769,56 @@ async def set_org_parameters(
     return params
 
 
+class BudgetIn(BaseModel):
+    monthly_credits: float = Field(..., ge=0)
+    alert_threshold: float = Field(0.8, gt=0, le=1)
+    block_on_limit: bool = True
+
+
+@router.get(
+    "/organizations/{org_id}/budget",
+    summary="Presupuesto y consumo del período (créditos)",
+)
+async def get_org_budget(org_id: str, request: Request):
+    _, oid = await _require_org_ctx(request, org_id, "tenant.read")
+    from src.platform.consumption.budget import consumption
+
+    return await consumption(oid)
+
+
+@router.put(
+    "/organizations/{org_id}/budget",
+    summary="Definir presupuesto mensual de créditos",
+)
+async def set_org_budget(org_id: str, body: BudgetIn, request: Request):
+    ctx, oid = await _require_org_ctx(request, org_id, "tenant.write")
+    from src.api.security import require_change_grant
+    from src.platform.consumption.budget import consumption, set_budget
+
+    change_request_id = await require_change_grant(request, oid)
+    await set_budget(
+        oid,
+        body.monthly_credits,
+        body.alert_threshold,
+        body.block_on_limit,
+        ctx.user_id,
+    )
+    await _audit().write_or_raise(
+        ctx,
+        "platform.organization_budget_updated",
+        "organization",
+        org_id,
+        ip_address=_client_ip(request),
+        metadata={
+            "monthly_credits": body.monthly_credits,
+            "alert_threshold": body.alert_threshold,
+            "block_on_limit": body.block_on_limit,
+            "change_request_id": change_request_id,
+        },
+    )
+    return await consumption(oid)
+
+
 # ---------------------------------------------------------------------------
 # Requerimientos de cambio — sustento auditable de la configuración
 # ---------------------------------------------------------------------------

@@ -18,6 +18,7 @@ import { ChangeGrantBar } from "../../components/org/ChangeGrantBar";
 import { OrgApplications } from "../../components/org/OrgApplications";
 import { OrgIngestion } from "../../components/org/OrgIngestion";
 import { OrgConsumption } from "../../components/org/OrgConsumption";
+import { OrgBudget } from "../../components/org/OrgBudget";
 import { OrgParameters } from "../../components/org/OrgParameters";
 import {
   ORG_SECTIONS,
@@ -240,7 +241,12 @@ export default function OrgContext() {
 
       {!loading && section === "parametros" && <OrgParameters orgId={orgId} />}
 
-      {!loading && section === "consumo" && <OrgConsumption orgId={orgId} />}
+      {!loading && section === "consumo" && (
+        <div className="space-y-6">
+          <OrgBudget orgId={orgId} />
+          <OrgConsumption orgId={orgId} />
+        </div>
+      )}
 
       {!loading && section === "ia" && (
         <Panel>
