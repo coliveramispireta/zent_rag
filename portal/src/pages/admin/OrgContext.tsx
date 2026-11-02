@@ -8,7 +8,7 @@ import {
   type LazyExoticComponent,
 } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import CustomerDetail from "./CustomerDetail";
+import { OrgAdministration } from "../../components/org/OrgAdministration";
 import { platformApi } from "../../api";
 import { usePlatformAuth } from "../../platformAuth";
 import {
@@ -200,19 +200,7 @@ export default function OrgContext() {
     <div className="space-y-6">
       <ChangeGrantBar orgId={orgId} />
 
-      <PageHeader
-        title={title}
-        subtitle={org?.email ?? undefined}
-        actions={
-          <ButtonLink
-            to={`/control-center/tenants/${orgId}`}
-            variant="secondary"
-            size="sm"
-          >
-            Ver ficha completa
-          </ButtonLink>
-        }
-      />
+      <PageHeader title={title} subtitle={org?.email ?? undefined} />
 
       <nav
         aria-label="Secciones de la organización"
@@ -291,7 +279,9 @@ export default function OrgContext() {
 
       {!loading && section === "parametros" && <OrgParameters orgId={orgId} />}
 
-      {!loading && section === "administracion" && <CustomerDetail embedded />}
+      {!loading && section === "administracion" && (
+        <OrgAdministration orgId={orgId} />
+      )}
 
       {!loading && section === "consumo" && (
         <div className="space-y-6">

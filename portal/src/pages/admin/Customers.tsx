@@ -1,27 +1,29 @@
-import { Buildings, MagnifyingGlass, Plus } from "@phosphor-icons/react";
+import {
+  Buildings,
+  DotsThreeVertical,
+  MagnifyingGlass,
+  Plus,
+} from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { platformApi } from "../../api";
 import {
-  Badge,
   Button,
-  ButtonLink,
   DataTable,
-  Drawer,
   EmptyState,
   ErrorInline,
   Field,
   Input,
-  Metric,
-  MetricGrid,
+  Menu,
+  MenuItem,
   Modal,
   PageHeader,
   Pagination,
   ResultCount,
   Select,
-  Skeleton,
   StatusBadge,
   cn,
+  menuItemClass,
   type Column,
   type SortState,
 } from "../../components/ui";
@@ -51,19 +53,6 @@ const FILTERS: { id: string; label: string }[] = [
 ];
 
 const PAGE_SIZE = 25;
-
-type OrgDetail = {
-  id: string;
-  plan: string | null;
-  subscription_status: string | null;
-  status: string;
-  users: number;
-  agents: number;
-  requests_30d: number;
-  mrr_cents: number;
-  amount_due_cents: number;
-  next_renewal_at: string | null;
-};
 
 function usdCents(cents: number) {
   return new Intl.NumberFormat("es-CL", {
@@ -115,10 +104,7 @@ export default function AdminCustomersPage() {
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState<SortState>({ key: "name", dir: "asc" });
   const [page, setPage] = useState(1);
-  const [peek, setPeek] = useState<Org | null>(null);
-  const [peekData, setPeekData] = useState<OrgDetail | null>(null);
-  const [peekLoading, setPeekLoading] = useState(false);
-  const [peekError, setPeekError] = useState("");
+  const [subject, setSubject] = useState<Org | null>(null);
 
   const navigate = useNavigate();
   const token = session?.token ?? "";
@@ -208,24 +194,6 @@ export default function AdminCustomersPage() {
     setPage(1);
   }, [query, filter]);
 
-  async function openPeek(org: Org) {
-    if (!session) return;
-    setPeek(org);
-    setPeekData(null);
-    setPeekError("");
-    setPeekLoading(true);
-    try {
-      setPeekData(
-        await platformApi<OrgDetail>(`/api/v1/platform/organizations/${org.id}`, {
-          token: session.token,
-        })
-      );
-    } catch (err) {
-      setPeekError(err instanceof Error ? err.message : "Error cargando el resumen");
-    } finally {
-      setPeekLoading(false);
-    }
-  }
 
   type OrgAction = "edit" | "suspend" | "activate" | "delete";
 
@@ -246,17 +214,17 @@ export default function AdminCustomersPage() {
     country: "",
   });
 
-  function openAction(kind: OrgAction) {
-    if (!peek) return;
+  function openAction(kind: OrgAction, org: Org) {
+    setSubject(org);
     setAction(kind);
     setActionError("");
     setActionNotice("");
     setConfirmText("");
     if (kind === "edit") {
       setEditForm({
-        name: peek.name ?? "",
-        company_name: peek.company_name ?? "",
-        email: peek.email ?? "",
+        name: org.name ?? "",
+        company_name: org.company_name ?? "",
+        email: org.email ?? "",
         ruc: "",
         phone: "",
         country: "",
@@ -269,7 +237,7 @@ export default function AdminCustomersPage() {
           setPreview(
             await platformApi<{
               organization?: { protected?: boolean; protected_reason?: string };
-            }>(`/api/v1/platform/organizations/${peek.id}/deletion-preview`, { token })
+            }>(`/api/v1/platform/organizations/${org.id}/deletion-preview`, { token })
           );
         } catch {
           setPreview({});
@@ -279,13 +247,13 @@ export default function AdminCustomersPage() {
   }
 
   async function runAction() {
-    if (!peek || !action) return;
+    if (!subject || !action) return;
     setActionBusy(true);
     setActionError("");
     try {
       if (action === "edit") {
-        const grant = readGrant(peek.id);
-        await platformApi(`/api/v1/platform/organizations/${peek.id}`, {
+        const grant = readGrant(subject.id);
+        await platformApi(`/api/v1/platform/organizations/${subject.id}`, {
           method: "PATCH",
           token,
           headers: grant ? { "X-Change-Token": grant.token } : undefined,
@@ -293,17 +261,18 @@ export default function AdminCustomersPage() {
         });
         setActionNotice("Datos de la organización actualizados.");
       } else if (action === "delete") {
-        await platformApi(`/api/v1/platform/organizations/${peek.id}`, {
+        await platformApi(`/api/v1/platform/organizations/${subject.id}`, {
           method: "DELETE",
           token,
           body: JSON.stringify({ confirmation: confirmText }),
         });
-        setActionNotice(`Organización eliminada: ${peek.company_name || peek.name}.`);
-        setPeek(null);
-        setPeekData(null);
+        setActionNotice(
+          `Organización eliminada: ${subject.company_name || subject.name}.`
+        );
+        setSubject(null);
       } else {
         await platformApi(
-          `/api/v1/platform/organizations/${peek.id}/${action}`,
+          `/api/v1/platform/organizations/${subject.id}/${action}`,
           { method: "POST", token, body: "{}" }
         );
         setActionNotice(
@@ -350,23 +319,6 @@ export default function AdminCustomersPage() {
 
   const columns: Column<Org>[] = [
     {
-      key: "actions",
-      header: "",
-      align: "right",
-      render: (o) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(event) => {
-            event.stopPropagation();
-            void openPeek(o);
-          }}
-        >
-          Acciones
-        </Button>
-      ),
-    },
-    {
       key: "name",
       header: "Empresa",
       sortable: true,
@@ -407,6 +359,53 @@ export default function AdminCustomersPage() {
       align: "right",
       sortable: true,
       render: (o) => <span className="mono">{usdCents(o.amount_due_cents || 0)}</span>,
+    },
+    {
+      key: "menu",
+      header: "",
+      align: "right",
+      render: (o) => (
+        <Menu
+          label={`Acciones para ${o.company_name || o.name}`}
+          trigger={
+            <Button
+              variant="ghost"
+              size="sm"
+              leadingIcon={DotsThreeVertical}
+              aria-label="Acciones"
+              onClick={(event) => event.stopPropagation()}
+            />
+          }
+        >
+          <MenuItem
+            className={menuItemClass}
+            onSelect={() => openAction("edit", o)}
+          >
+            Editar datos
+          </MenuItem>
+          <MenuItem
+            className={menuItemClass}
+            onSelect={() =>
+              openAction(
+                (o.subscription_status || o.status) === "suspended"
+                  ? "activate"
+                  : "suspend",
+                o
+              )
+            }
+          >
+            {(o.subscription_status || o.status) === "suspended"
+              ? "Reactivar"
+              : "Suspender"}
+          </MenuItem>
+          <MenuItem
+            className={`${menuItemClass} text-danger`}
+            onSelect={() => openAction("delete", o)}
+          >
+            Eliminar
+          </MenuItem>
+        </Menu>
+      ),
     },
     {
       key: "renewal",
@@ -604,93 +603,6 @@ export default function AdminCustomersPage() {
         }
       />
 
-      <Drawer
-        open={!!peek}
-        onOpenChange={(open) => {
-          if (!open) setPeek(null);
-        }}
-        title={peek ? peek.company_name || peek.name : "Organización"}
-        description={peek?.email || undefined}
-        width={420}
-        footer={
-          peek && (
-            <div className="flex w-full flex-col gap-2">
-              <ButtonLink
-                variant="primary"
-                size="sm"
-                to={`/control-center/org/${peek.id}`}
-              >
-                Abrir contexto de la organización
-              </ButtonLink>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => openAction("edit")}
-                >
-                  Editar datos
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => openAction("delete")}
-                >
-                  Eliminar
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="col-span-2"
-                  onClick={() =>
-                    openAction(
-                      (peekData?.subscription_status || peekData?.status) === "suspended"
-                        ? "activate"
-                        : "suspend"
-                    )
-                  }
-                >
-                  {(peekData?.subscription_status || peekData?.status) === "suspended"
-                    ? "Reactivar organización"
-                    : "Suspender organización"}
-                </Button>
-              </div>
-            </div>
-          )
-        }
-      >
-        {peekLoading ? (
-          <Skeleton className="h-[180px] rounded-lg" />
-        ) : (
-          <>
-            <ErrorInline message={peekError} />
-            {peekData && (
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone="neutral">Plan: {peekData.plan || "—"}</Badge>
-                  <StatusBadge status={peekData.subscription_status || peekData.status} />
-                </div>
-                <MetricGrid cols={2}>
-                  <Metric size="md" label="MRR" value={usdCents(peekData.mrr_cents)} />
-                  <Metric size="md" label="Por pagar" value={usdCents(peekData.amount_due_cents)} />
-                  <Metric size="md" label="Usuarios" value={peekData.users} />
-                  <Metric size="md" label="Agentes" value={peekData.agents} />
-                  <Metric size="md" label="Requests 30d" value={peekData.requests_30d} />
-                  <Metric
-                    size="md"
-                    label="Próxima renovación"
-                    value={
-                      peekData.next_renewal_at
-                        ? new Date(peekData.next_renewal_at).toLocaleDateString("es-CL")
-                        : "—"
-                    }
-                  />
-                </MetricGrid>
-              </div>
-            )}
-          </>
-        )}
-      </Drawer>
-
       <Modal
         open={action === "edit"}
         onOpenChange={(open) => !open && setAction(null)}
@@ -758,7 +670,7 @@ export default function AdminCustomersPage() {
         open={action === "suspend" || action === "activate"}
         onOpenChange={(open) => !open && setAction(null)}
         title={action === "suspend" ? "Suspender organización" : "Reactivar organización"}
-        description={peek ? peek.company_name || peek.name : undefined}
+        description={subject ? subject.company_name || subject.name : undefined}
         footer={
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setAction(null)}>
@@ -811,7 +723,7 @@ export default function AdminCustomersPage() {
             Se eliminan permanentemente los agentes, el conocimiento, las claves,
             el consumo y la auditoría de{" "}
             <strong className="text-text">
-              {peek ? peek.company_name || peek.name : ""}
+              {subject ? subject.company_name || subject.name : ""}
             </strong>
             . Antes conviene descargar un respaldo.
           </p>
@@ -824,7 +736,7 @@ export default function AdminCustomersPage() {
             />
           )}
           <Field
-            label={`Escribí «${peek ? peek.company_name || peek.name : ""}» para confirmar`}
+            label={`Escribí «${subject ? subject.company_name || subject.name : ""}» para confirmar`}
           >
             <Input
               value={confirmText}
