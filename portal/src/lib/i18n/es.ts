@@ -22,7 +22,7 @@ export const es = {
   "nav.item.tenants": "Organizaciones",
   "nav.item.applications": "Aplicaciones",
   "nav.item.changeRequests": "Requerimientos",
-  "nav.item.customers": "Clientes",
+  "nav.item.customers": "Éxito del cliente",
   "nav.item.subscriptions": "Suscripciones",
   "nav.item.revenue": "Ingresos",
   "nav.item.partners": "Socios",

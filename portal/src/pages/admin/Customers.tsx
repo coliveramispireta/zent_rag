@@ -364,7 +364,11 @@ export default function AdminCustomersPage() {
       key: "menu",
       header: "",
       align: "right",
+      // El menú se portaliza, pero React propaga el evento por el árbol de
+      // componentes: sin este corte, el clic del ítem dispara el onRowClick y
+      // navega al contexto en vez de abrir la acción.
       render: (o) => (
+        <div onClick={(event) => event.stopPropagation()}>
         <Menu
           label={`Acciones para ${o.company_name || o.name}`}
           trigger={
@@ -405,6 +409,7 @@ export default function AdminCustomersPage() {
             Eliminar
           </MenuItem>
         </Menu>
+        </div>
       ),
     },
     {
@@ -425,8 +430,8 @@ export default function AdminCustomersPage() {
   return (
     <div>
       <PageHeader
-        title="Clientes"
-        subtitle="Organizaciones de la plataforma."
+        title="Organizaciones"
+        subtitle="Todas las organizaciones que operan en Zent. Entrá a una para administrarla en su contexto."
         actions={
           <Button leadingIcon={Plus} onClick={() => void openCreate()}>
             Nueva organización
