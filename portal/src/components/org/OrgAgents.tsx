@@ -364,10 +364,6 @@ export function OrgAgents({ orgId }: { orgId: string }) {
           </ul>
         )}
 
-        <p className="mt-4 text-xs text-muted">
-          El editor visual del flujo (nodos, condiciones y prueba) todavía se abre
-          desde el portal del agente.
-        </p>
       </Drawer>
     </div>
   );
