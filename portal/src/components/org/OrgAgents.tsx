@@ -4,8 +4,10 @@ import { platformApi } from "../../api";
 import { usePlatformAuth } from "../../platformAuth";
 import {
   Badge,
+  Button,
   type Column,
   DataTable,
+  Drawer,
   EmptyState,
   ErrorInline,
   Input,
@@ -16,7 +18,8 @@ import {
   Select,
   SkeletonBlock,
 } from "../../components/ui";
-import { fmtDate } from "../../lib/format";
+import { fmtDate, fmtDateTime } from "../../lib/format";
+import { readGrant } from "../../lib/changeGrant";
 
 type OrgAgent = {
   id: string;
@@ -28,6 +31,25 @@ type OrgAgent = {
 };
 
 type StatusFilter = "all" | "active" | "inactive";
+
+type Automation = {
+  workflow_id: string;
+  name: string;
+  status: string;
+  when: string;
+  runs_7d: number;
+  failed_runs: number;
+  success_rate: number | string | null;
+  last_activity?: string | null;
+};
+
+const AUTOMATION_LABEL: Record<string, string> = {
+  active: "Activo",
+  paused: "Pausado",
+  draft: "Borrador",
+  error: "Con errores",
+  needs_attention: "Requiere atención",
+};
 
 /**
  * Nivel 2 — Agentes de la organización.
@@ -43,8 +65,59 @@ export function OrgAgents({ orgId }: { orgId: string }) {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
+  const [selected, setSelected] = useState<OrgAgent | null>(null);
+  const [automations, setAutomations] = useState<Automation[]>([]);
+  const [flowLoading, setFlowLoading] = useState(false);
+  const [flowError, setFlowError] = useState("");
+  const [busyFlow, setBusyFlow] = useState("");
 
   const token = session?.token ?? "";
+
+  async function openAgent(agent: OrgAgent) {
+    setSelected(agent);
+    setAutomations([]);
+    setFlowError("");
+    setFlowLoading(true);
+    try {
+      const data = await platformApi<{ automations: Automation[] }>(
+        `/api/v1/platform/organizations/${orgId}/agents/${agent.id}/automations`,
+        { token },
+      );
+      setAutomations(data.automations ?? []);
+    } catch (e) {
+      setFlowError(
+        e instanceof Error ? e.message : "No se pudieron cargar los flujos del agente.",
+      );
+    } finally {
+      setFlowLoading(false);
+    }
+  }
+
+  async function toggleFlow(flow: Automation) {
+    setBusyFlow(flow.workflow_id);
+    setFlowError("");
+    try {
+      const grant = readGrant(orgId);
+      await platformApi(`/api/v1/platform/workflows/${flow.workflow_id}/status`, {
+        method: "POST",
+        token,
+        headers: grant ? { "X-Change-Token": grant.token } : undefined,
+        body: JSON.stringify({
+          status: flow.status === "active" ? "paused" : "active",
+        }),
+      });
+      if (selected) await openAgent(selected);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "";
+      setFlowError(
+        message.includes("change_grant_required")
+          ? "Tomá un requerimiento abierto para pausar o activar flujos."
+          : message || "No se pudo cambiar el estado del flujo.",
+      );
+    } finally {
+      setBusyFlow("");
+    }
+  }
 
   useEffect(() => {
     if (!token || !orgId) return;
@@ -107,6 +180,23 @@ export function OrgAgents({ orgId }: { orgId: string }) {
       ),
     },
     {
+      key: "flows",
+      header: "Flujos",
+      align: "right",
+      render: (agent) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(event) => {
+            event.stopPropagation();
+            void openAgent(agent);
+          }}
+        >
+          Ver flujos
+        </Button>
+      ),
+    },
+    {
       key: "deployments",
       header: "Despliegues",
       align: "right",
@@ -137,7 +227,7 @@ export function OrgAgents({ orgId }: { orgId: string }) {
       <Panel>
         <PanelHeader
           title="Agentes de la organización"
-          description="Alta, configuración y pausa de agentes. Hoy la vista es de solo lectura: la administración se habilita cuando exista el endpoint por organización."
+          description="Agentes de la organización. Abrí uno para ver sus flujos de trabajo y pausarlos o activarlos."
         />
 
         <div className="flex flex-wrap items-end gap-2 px-4 pb-3 pt-4">
@@ -172,6 +262,7 @@ export function OrgAgents({ orgId }: { orgId: string }) {
             rows={rows}
             rowKey={(agent) => agent.id}
             caption="Agentes de la organización"
+            onRowClick={(agent) => void openAgent(agent)}
             empty={
               <EmptyState
                 icon={Robot}
@@ -186,6 +277,82 @@ export function OrgAgents({ orgId }: { orgId: string }) {
           />
         )}
       </Panel>
+
+      <Drawer
+        open={Boolean(selected)}
+        onOpenChange={(open) => {
+          if (!open) setSelected(null);
+        }}
+        title={selected ? `Flujos de ${selected.name}` : "Flujos del agente"}
+        description="Automatizaciones ligadas a este agente. Se pueden pausar o activar sin salir del contexto."
+        width={520}
+      >
+        {flowError && <ErrorInline message={flowError} />}
+        {flowLoading ? (
+          <SkeletonBlock rows={3} />
+        ) : automations.length === 0 ? (
+          <EmptyState
+            icon={Robot}
+            title="Sin flujos"
+            body="Este agente todavía no tiene automatizaciones."
+            compact
+          />
+        ) : (
+          <ul className="space-y-2">
+            {automations.map((flow) => (
+              <li
+                key={flow.workflow_id}
+                className="rounded-md border border-border bg-soft px-3 py-2.5"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium text-text">{flow.name}</span>
+                  <Badge
+                    tone={
+                      flow.status === "active"
+                        ? "ok"
+                        : flow.status === "error"
+                          ? "danger"
+                          : "neutral"
+                    }
+                  >
+                    {AUTOMATION_LABEL[flow.status] ?? flow.status}
+                  </Badge>
+                  <span className="ml-auto text-xs text-faint tabular-nums">
+                    {flow.runs_7d} ejec. · {flow.success_rate ?? "—"}%
+                  </span>
+                </div>
+                {flow.when && (
+                  <p className="mt-1 text-xs text-muted">Cuando {flow.when.toLowerCase()}</p>
+                )}
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={busyFlow === flow.workflow_id}
+                    onClick={() => void toggleFlow(flow)}
+                  >
+                    {busyFlow === flow.workflow_id
+                      ? "Cambiando…"
+                      : flow.status === "active"
+                        ? "Pausar"
+                        : "Activar"}
+                  </Button>
+                  {flow.last_activity && (
+                    <span className="text-xs text-faint">
+                      Última actividad {fmtDateTime(flow.last_activity)}
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p className="mt-4 text-xs text-muted">
+          El editor visual del flujo (nodos, condiciones y prueba) todavía se abre
+          desde el portal del agente.
+        </p>
+      </Drawer>
     </div>
   );
 }

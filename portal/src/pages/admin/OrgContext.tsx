@@ -84,7 +84,10 @@ const AI_VIEWS: Record<
     Page: lazy(() => import("./CostGovernance")),
   },
   optimizer: { label: "Optimizador", Page: lazy(() => import("./Optimizer")) },
-  workflows: { label: "Flujos de trabajo", Page: lazy(() => import("./Workflows")) },
+  workflows: {
+    label: "Ejecuciones de flujos",
+    Page: lazy(() => import("./Workflows")),
+  },
   copilot: { label: "Copiloto", Page: lazy(() => import("./Copilot")) },
   feedback: { label: "Retroalimentación", Page: lazy(() => import("./Feedback")) },
   "chat-insights": {

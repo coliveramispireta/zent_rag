@@ -4010,6 +4010,94 @@ async def platform_workflows(request: Request, organization_id: str | None = Non
     return {"workflows": await list_definitions(oid, limit=200)}
 
 
+@router.get(
+    "/organizations/{org_id}/agents/{agent_id}/automations",
+    summary="Flujos de trabajo (automatizaciones) de un agente",
+)
+async def platform_agent_automations(org_id: str, agent_id: str, request: Request):
+    _, oid = await _require_org_ctx(request, org_id, "tenant.read")
+    from src.platform.workflows.assistants import agent_automations
+
+    try:
+        aid = UUID(agent_id)
+    except ValueError:
+        raise HTTPException(400, "agent_id must be a valid UUID")
+    data = await agent_automations(oid, aid)
+    if data is None:
+        raise HTTPException(404, "Agent not found")
+    return data
+
+
+class WorkflowStatusIn(BaseModel):
+    status: Literal["active", "paused"]
+
+
+@router.post(
+    "/workflows/{workflow_id}/status",
+    summary="Activar o pausar un flujo de trabajo de un tenant",
+)
+async def platform_workflow_status(
+    workflow_id: str, body: WorkflowStatusIn, request: Request
+):
+    from src.api.security import require_change_grant
+
+    try:
+        wid = UUID(workflow_id)
+    except ValueError:
+        raise HTTPException(400, "workflow_id must be a valid UUID")
+
+    lookup = await get_async_session()
+    try:
+        row = (
+            await lookup.execute(
+                text("SELECT organization_id FROM workflows WHERE id = :wid"),
+                {"wid": wid},
+            )
+        ).fetchone()
+    finally:
+        await lookup.close()
+    if row is None:
+        raise HTTPException(404, "Workflow not found")
+
+    ctx, oid = await _require_org_ctx(request, str(row.organization_id), "tenant.write")
+    change_request_id = await require_change_grant(request, oid)
+
+    session = await get_async_session()
+    try:
+        updated = (
+            await session.execute(
+                text(
+                    "UPDATE workflows SET status = :status, updated_at = NOW() "
+                    "WHERE id = :wid AND organization_id = :oid RETURNING name"
+                ),
+                {"wid": wid, "oid": oid, "status": body.status},
+            )
+        ).fetchone()
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
+    if updated is None:
+        raise HTTPException(404, "Workflow not found")
+
+    await _audit().write_or_raise(
+        ctx,
+        f"platform.workflow_{body.status}",
+        "workflow",
+        workflow_id,
+        organization_id=oid,
+        ip_address=_client_ip(request),
+        metadata={
+            "name": updated.name,
+            "status": body.status,
+            "change_request_id": change_request_id,
+        },
+    )
+    return {"id": workflow_id, "name": updated.name, "status": body.status}
+
+
 @router.post("/workflows/{workflow_id}/trigger", summary="Disparar workflow de un tenant")
 async def platform_workflow_trigger(workflow_id: str, request: Request):
     ctx = require_platform_permission(request, "operations.write")
