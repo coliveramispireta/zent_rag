@@ -77,6 +77,7 @@ from src.api.routes.organizations import router as organizations_router
 from src.api.routes.payments_webhook import router as payments_webhook_router
 from src.api.routes.platform import router as platform_router
 from src.api.routes.platform_features import router as platform_features_router
+from src.api.routes.platform_workflows import router as platform_workflows_router
 from src.api.routes.projects import router as projects_router
 from src.api.routes.prompt import router as prompt_router
 from src.api.routes.public_query import router as public_query_router
@@ -722,6 +723,7 @@ def create_app(*, metrics_enabled: bool | None = None, tracing_enabled: bool | N
     new_app.include_router(kbs_router)
     new_app.include_router(organizations_router)
     new_app.include_router(platform_router)
+    new_app.include_router(platform_workflows_router)
     new_app.include_router(projects_router)
     new_app.include_router(prompt_router)
     new_app.include_router(query_router)
