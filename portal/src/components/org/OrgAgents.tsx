@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Robot } from "@phosphor-icons/react";
 import { platformApi } from "../../api";
 import { usePlatformAuth } from "../../platformAuth";
@@ -11,13 +11,16 @@ import {
   Drawer,
   EmptyState,
   ErrorInline,
+  Field,
   Input,
   Metric,
   MetricGrid,
+  Modal,
   Panel,
   PanelHeader,
   Select,
   SkeletonBlock,
+  Textarea,
 } from "../../components/ui";
 import { fmtDate, fmtDateTime } from "../../lib/format";
 import { readGrant } from "../../lib/changeGrant";
@@ -71,8 +74,115 @@ export function OrgAgents({ orgId }: { orgId: string }) {
   const [flowLoading, setFlowLoading] = useState(false);
   const [flowError, setFlowError] = useState("");
   const [busyFlow, setBusyFlow] = useState("");
+  const [agentModal, setAgentModal] = useState<"new" | "edit" | null>(null);
+  const [agentSaving, setAgentSaving] = useState(false);
+  const [agentError, setAgentError] = useState("");
+  const [kbs, setKbs] = useState<{ id: string; name: string }[]>([]);
+  const [agentForm, setAgentForm] = useState({
+    name: "",
+    description: "",
+    system_prompt: "",
+    model: "",
+    is_active: true,
+    knowledge_base_ids: [] as string[],
+  });
 
   const token = session?.token ?? "";
+
+  async function loadKbs() {
+    try {
+      const data = await platformApi<{ knowledge_bases: { id: string; name: string }[] }>(
+        `/api/v1/platform/organizations/${orgId}/knowledge-bases`,
+        { token }
+      );
+      setKbs(data.knowledge_bases ?? []);
+    } catch {
+      setKbs([]);
+    }
+  }
+
+  function openNewAgent() {
+    setAgentError("");
+    setAgentForm({
+      name: "",
+      description: "",
+      system_prompt: "",
+      model: "",
+      is_active: true,
+      knowledge_base_ids: [],
+    });
+    setAgentModal("new");
+    void loadKbs();
+  }
+
+  async function openEditAgent() {
+    if (!selected) return;
+    setAgentError("");
+    try {
+      const detail = await platformApi<{
+        name: string;
+        description: string | null;
+        system_prompt: string | null;
+        model: string | null;
+        is_active: boolean;
+        knowledge_base_ids: string[];
+      }>(`/api/v1/platform/organizations/${orgId}/agents/${selected.id}`, { token });
+      setAgentForm({
+        name: detail.name,
+        description: detail.description ?? "",
+        system_prompt: detail.system_prompt ?? "",
+        model: detail.model ?? "",
+        is_active: detail.is_active,
+        knowledge_base_ids: detail.knowledge_base_ids ?? [],
+      });
+      setAgentModal("edit");
+      await loadKbs();
+    } catch (e) {
+      setFlowError(e instanceof Error ? e.message : "No se pudo cargar el agente.");
+    }
+  }
+
+  async function saveAgent() {
+    setAgentSaving(true);
+    setAgentError("");
+    try {
+      const grant = readGrant(orgId);
+      const payload = {
+        name: agentForm.name.trim(),
+        description: agentForm.description.trim() || null,
+        system_prompt: agentForm.system_prompt.trim() || null,
+        model: agentForm.model.trim() || null,
+        is_active: agentForm.is_active,
+        knowledge_base_ids: agentForm.knowledge_base_ids,
+      };
+      if (agentModal === "edit" && selected) {
+        await platformApi(`/api/v1/platform/organizations/${orgId}/agents/${selected.id}`, {
+          method: "PATCH",
+          token,
+          headers: grant ? { "X-Change-Token": grant.token } : undefined,
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await platformApi(`/api/v1/platform/organizations/${orgId}/agents`, {
+          method: "POST",
+          token,
+          headers: grant ? { "X-Change-Token": grant.token } : undefined,
+          body: JSON.stringify({ ...payload, tools: [] }),
+        });
+      }
+      setAgentModal(null);
+      await reloadAgents();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "";
+      setAgentError(
+        message.includes("change_grant_required")
+          ? "Tomá un requerimiento abierto para crear o editar agentes."
+          : message || "No se pudo guardar el agente.",
+      );
+    } finally {
+      setAgentSaving(false);
+    }
+  }
 
   async function openAgent(agent: OrgAgent) {
     setSelected(agent);
@@ -120,29 +230,26 @@ export function OrgAgents({ orgId }: { orgId: string }) {
     }
   }
 
-  useEffect(() => {
+  const reloadAgents = useCallback(async () => {
     if (!token || !orgId) return;
-    let cancelled = false;
     setLoading(true);
     setError("");
-    platformApi<{ agents: OrgAgent[] }>(
-      `/api/v1/platform/organizations/${orgId}/agents`,
-      { token },
-    )
-      .then((data) => {
-        if (!cancelled) setAgents(data.agents ?? []);
-      })
-      .catch((e) => {
-        if (!cancelled)
-          setError(e instanceof Error ? e.message : "No se pudieron cargar los agentes.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+    try {
+      const data = await platformApi<{ agents: OrgAgent[] }>(
+        `/api/v1/platform/organizations/${orgId}/agents`,
+        { token },
+      );
+      setAgents(data.agents ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudieron cargar los agentes.");
+    } finally {
+      setLoading(false);
+    }
   }, [token, orgId]);
+
+  useEffect(() => {
+    void reloadAgents();
+  }, [reloadAgents]);
 
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -230,12 +337,21 @@ export function OrgAgents({ orgId }: { orgId: string }) {
           title="Agentes de la organización"
           description="Agentes de la organización. Abrí uno para ver sus flujos de trabajo, editarlos y pausarlos."
           actions={
-            <ButtonLink
-              to={`/control-center/org/${orgId}/flujos/nuevo`}
-              size="sm"
-            >
-              Nuevo flujo
-            </ButtonLink>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={openNewAgent}
+              >
+                Nuevo agente
+              </Button>
+              <ButtonLink
+                to={`/control-center/org/${orgId}/flujos/nuevo`}
+                size="sm"
+              >
+                Nuevo flujo
+              </ButtonLink>
+            </div>
           }
         />
 
@@ -295,6 +411,21 @@ export function OrgAgents({ orgId }: { orgId: string }) {
         title={selected ? `Flujos de ${selected.name}` : "Flujos del agente"}
         description="Automatizaciones ligadas a este agente. Se pueden pausar o activar sin salir del contexto."
         width={520}
+        footer={
+          selected && (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={() => void openEditAgent()}>
+                Editar agente
+              </Button>
+              <ButtonLink
+                to={`/control-center/org/${orgId}/flujos/nuevo?agente=${selected.id}`}
+                size="sm"
+              >
+                Nuevo flujo con este agente
+              </ButtonLink>
+            </div>
+          )
+        }
       >
         {flowError && <ErrorInline message={flowError} />}
         {flowLoading ? (
@@ -365,6 +496,109 @@ export function OrgAgents({ orgId }: { orgId: string }) {
         )}
 
       </Drawer>
+
+      <Modal
+        open={agentModal !== null}
+        onOpenChange={(open) => !open && setAgentModal(null)}
+        title={agentModal === "edit" ? "Editar agente" : "Nuevo agente"}
+        description="El prompt define cómo responde. El flujo se enlaza después desde el editor, eligiendo este agente en el nodo LLM."
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setAgentModal(null)}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={agentSaving || agentForm.name.trim().length < 2}
+              onClick={() => void saveAgent()}
+            >
+              {agentSaving ? "Guardando…" : "Guardar agente"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Nombre" className="sm:col-span-2">
+            <Input
+              value={agentForm.name}
+              onChange={(event) => setAgentForm({ ...agentForm, name: event.target.value })}
+              placeholder="Ej. Ventas WhatsApp"
+            />
+          </Field>
+          <Field label="Descripción" className="sm:col-span-2">
+            <Input
+              value={agentForm.description}
+              onChange={(event) =>
+                setAgentForm({ ...agentForm, description: event.target.value })
+              }
+              placeholder="Para qué sirve este agente"
+            />
+          </Field>
+          <Field
+            label="Prompt del sistema"
+            hint="Cómo responde, qué tono usa y qué no debe hacer."
+            className="sm:col-span-2"
+          >
+            <Textarea
+              rows={4}
+              value={agentForm.system_prompt}
+              onChange={(event) =>
+                setAgentForm({ ...agentForm, system_prompt: event.target.value })
+              }
+            />
+          </Field>
+          <Field label="Modelo" hint="Vacío = modelo por defecto de la organización">
+            <Input
+              value={agentForm.model}
+              onChange={(event) => setAgentForm({ ...agentForm, model: event.target.value })}
+              placeholder="gpt-4o-mini"
+            />
+          </Field>
+          <Field label="Estado">
+            <label className="flex h-9 items-center gap-2 text-sm text-text">
+              <input
+                type="checkbox"
+                checked={agentForm.is_active}
+                onChange={(event) =>
+                  setAgentForm({ ...agentForm, is_active: event.target.checked })
+                }
+              />
+              Agente activo
+            </label>
+          </Field>
+          <Field
+            label="Conocimiento"
+            hint="Colecciones de conocimiento a las que puede mirar."
+            className="sm:col-span-2"
+          >
+            {kbs.length === 0 ? (
+              <p className="text-xs text-muted">La organización no tiene colecciones.</p>
+            ) : (
+              <ul className="space-y-1">
+                {kbs.map((kb) => (
+                  <li key={kb.id}>
+                    <label className="flex items-center gap-2 text-sm text-text">
+                      <input
+                        type="checkbox"
+                        checked={agentForm.knowledge_base_ids.includes(kb.id)}
+                        onChange={(event) =>
+                          setAgentForm({
+                            ...agentForm,
+                            knowledge_base_ids: event.target.checked
+                              ? [...agentForm.knowledge_base_ids, kb.id]
+                              : agentForm.knowledge_base_ids.filter((id) => id !== kb.id),
+                          })
+                        }
+                      />
+                      {kb.name}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Field>
+        </div>
+        {agentError && <ErrorInline message={agentError} className="mt-3" />}
+      </Modal>
     </div>
   );
 }

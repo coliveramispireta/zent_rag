@@ -69,7 +69,7 @@ function isSalesFunnel(graph: WorkflowGraph | null | undefined): boolean {
   return metadata.template === "retail_sales_funnel";
 }
 
-function starterGraph(): WorkflowGraph {
+function starterGraph(agentId?: string): WorkflowGraph {
   const g = emptyGraph("webhook");
   const trigger = g.nodes[0];
   g.nodes.push({
@@ -87,6 +87,28 @@ function starterGraph(): WorkflowGraph {
     metadata: { automatic: true },
   });
   g.edges.push({ id: "e1", from_node: trigger.id, from_port: "out", to_node: "end", to_port: "in" });
+
+  // Alta desde un agente: el nodo LLM ya queda apuntando a ese agente.
+  if (agentId) {
+    g.nodes.splice(1, 0, {
+      id: "agent",
+      type: "llm",
+      version: 1,
+      label: "Responder con el agente",
+      position: { x: 180, y: 90 },
+      config: { agent_id: agentId },
+      input_ports: [{ name: "in", type: "json" }],
+      output_ports: [{ name: "out", type: "json" }],
+      retry_policy: { max_attempts: 1 },
+      timeout_ms: 60_000,
+      error_policy: "fail",
+      metadata: {},
+    });
+    g.edges = [
+      { id: "e1", from_node: trigger.id, from_port: "out", to_node: "agent", to_port: "in" },
+      { id: "e2", from_node: "agent", from_port: "out", to_node: "end", to_port: "in" },
+    ];
+  }
   return g;
 }
 
@@ -383,7 +405,10 @@ export default function WorkflowStudioPage() {
           trigger_config: {},
           steps: [],
           editor_state: { mode: "canvas", config_level: configLevel },
-          graph: searchParams.get("plantilla") === "mentor" ? mentorGraph() : starterGraph(),
+          graph:
+            searchParams.get("plantilla") === "mentor"
+              ? mentorGraph()
+              : starterGraph(searchParams.get("agente") ?? undefined),
           workflow_version: 2,
         }),
       });
