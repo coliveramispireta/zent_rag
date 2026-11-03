@@ -33,8 +33,8 @@ describe("OrgApplications (Nivel 2)", () => {
     expect(await screen.findByText("Mentora")).toBeInTheDocument();
     expect(screen.getByText("mentora")).toBeInTheDocument();
     expect(screen.getByText("Activa")).toBeInTheDocument();
-    // Métrica y panel comparten el título "Acceso directo".
-    expect(screen.getAllByText("Acceso directo").length).toBeGreaterThan(1);
+    // El acceso directo se informa como métrica; ya no hay panel vacío.
+    expect(screen.getAllByText("Acceso directo").length).toBeGreaterThan(0);
     expect(vi.mocked(platformApi)).toHaveBeenCalledWith(
       "/api/v1/platform/organizations/org-1/applications",
       { token: "t" },

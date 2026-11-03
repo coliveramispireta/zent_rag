@@ -570,6 +570,8 @@ export default function App() {
         <Route path="applications" element={<Suspense fallback={<PageFallback />}><AdminApplicationsPage /></Suspense>} />
         <Route path="change-requests" element={<Suspense fallback={<PageFallback />}><AdminChangeRequestsPage /></Suspense>} />
         <Route path="org/:orgId" element={<Suspense fallback={<PageFallback />}><AdminOrgContextPage /></Suspense>} />
+        <Route path="org/:orgId/flujos/nuevo" element={<Suspense fallback={<PageFallback />}><WorkflowStudioPage /></Suspense>} />
+        <Route path="org/:orgId/flujos/:flowId" element={<Suspense fallback={<PageFallback />}><WorkflowStudioPage /></Suspense>} />
         <Route path="staff" element={<Suspense fallback={<PageFallback />}><AdminStaffPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<PageFallback />}><AdminSettingsPage /></Suspense>} />
         <Route path="settings/plans" element={<Suspense fallback={<PageFallback />}><AdminPlansPage /></Suspense>} />

@@ -1,6 +1,6 @@
 import { ArrowCounterClockwise, Camera, RocketLaunch, SealCheck } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { useAuth } from "../../auth";
 import { fmtDateTime } from "../../lib/format";
 import { Button, ConfirmDialog, ErrorInline, Field, Input, StatusBadge, SuccessInline } from "../ui";

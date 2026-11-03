@@ -7,7 +7,7 @@
  */
 import { CaretDown, CaretRight } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { useAuth } from "../../auth";
 import { Button } from "../ui";
 

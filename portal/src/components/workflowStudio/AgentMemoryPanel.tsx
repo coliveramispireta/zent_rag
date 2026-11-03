@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { ErrorInline, SkeletonBlock } from "../ui";
 import type { AgentOption } from "./types";
 

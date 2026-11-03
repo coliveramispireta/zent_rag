@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OrgAgents } from "./OrgAgents";
 
@@ -35,7 +36,11 @@ describe("OrgAgents (Nivel 2)", () => {
   });
 
   it("lista los agentes de la organización con su estado", async () => {
-    render(<OrgAgents orgId="org-1" />);
+    render(
+      <MemoryRouter>
+        <OrgAgents orgId="org-1" />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByText("Ventas WhatsApp")).toBeInTheDocument();
     expect(screen.getByText("Soporte interno")).toBeInTheDocument();
@@ -48,7 +53,11 @@ describe("OrgAgents (Nivel 2)", () => {
   });
 
   it("filtra por estado y por nombre", async () => {
-    render(<OrgAgents orgId="org-1" />);
+    render(
+      <MemoryRouter>
+        <OrgAgents orgId="org-1" />
+      </MemoryRouter>,
+    );
     await screen.findByText("Ventas WhatsApp");
 
     await userEvent.selectOptions(

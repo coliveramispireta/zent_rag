@@ -1,6 +1,6 @@
 import { ArrowUp, Lightning, MagicWand, Warning } from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { useAuth } from "../../auth";
 import { effectNodes, nodeMeta } from "../../lib/workflowGraph";
 import type { GraphIssue, WorkflowGraph } from "../../lib/workflowGraph";

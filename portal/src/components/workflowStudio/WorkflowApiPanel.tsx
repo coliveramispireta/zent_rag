@@ -1,6 +1,6 @@
 import { ArrowsClockwise, Copy } from "@phosphor-icons/react";
 import { useState } from "react";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { useAuth } from "../../auth";
 import { ErrorInline, SuccessInline } from "../ui";
 import { hookCurl, hookFetch } from "./types";

@@ -5,6 +5,7 @@ import { usePlatformAuth } from "../../platformAuth";
 import {
   Badge,
   Button,
+  ButtonLink,
   type Column,
   DataTable,
   Drawer,
@@ -227,7 +228,15 @@ export function OrgAgents({ orgId }: { orgId: string }) {
       <Panel>
         <PanelHeader
           title="Agentes de la organización"
-          description="Agentes de la organización. Abrí uno para ver sus flujos de trabajo y pausarlos o activarlos."
+          description="Agentes de la organización. Abrí uno para ver sus flujos de trabajo, editarlos y pausarlos."
+          actions={
+            <ButtonLink
+              to={`/control-center/org/${orgId}/flujos/nuevo`}
+              size="sm"
+            >
+              Nuevo flujo
+            </ButtonLink>
+          }
         />
 
         <div className="flex flex-wrap items-end gap-2 px-4 pb-3 pt-4">
@@ -325,6 +334,13 @@ export function OrgAgents({ orgId }: { orgId: string }) {
                   <p className="mt-1 text-xs text-muted">Cuando {flow.when.toLowerCase()}</p>
                 )}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <ButtonLink
+                    to={`/control-center/org/${orgId}/flujos/${flow.workflow_id}`}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    Abrir editor
+                  </ButtonLink>
                   <Button
                     variant="secondary"
                     size="sm"

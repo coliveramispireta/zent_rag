@@ -7,7 +7,7 @@
 import { ArrowRight, Checks, Code, FloppyDisk, MagicWand, PencilSimple, Sparkle, WarningCircle } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { useAuth } from "../../auth";
 import { Badge, Button, ErrorInline, Textarea } from "../ui";
 

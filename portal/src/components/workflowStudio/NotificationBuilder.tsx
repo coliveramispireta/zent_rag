@@ -6,7 +6,7 @@
  */
 import { PaperPlaneTilt, Plus, Trash, WarningCircle } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { useAuth } from "../../auth";
 import type { DataSourceOption } from "../../lib/dataPicker";
 import { Button, ButtonLink, Input, Select, Textarea } from "../ui";

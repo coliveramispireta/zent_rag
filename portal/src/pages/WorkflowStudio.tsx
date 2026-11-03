@@ -1,9 +1,12 @@
 import { ArrowClockwise, ArrowCounterClockwise, ArrowLeft, Brain, ChatCircleDots, Code, FloppyDisk, Lightning, MagicWand, SlidersHorizontal } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { api } from "../api";
+import { studioApi as api } from "../lib/studioApi";
 import { isApiError } from "../lib/errors";
 import { useAuth } from "../auth";
+import { usePlatformAuth } from "../platformAuth";
+import { setStudioTarget } from "../lib/studioApi";
+import type { Session } from "../api";
 import { Breadcrumb } from "../components/Breadcrumb";
 import {
   Button,
@@ -130,12 +133,40 @@ function draftKey(workflowId: string): string {
 }
 
 export default function WorkflowStudioPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id?: string; orgId?: string; flowId?: string }>();
+  const ccOrgId = params.orgId;
+  const platformMode = Boolean(ccOrgId);
+  const id = params.id ?? params.flowId;
   const isNew = !id || id === "new";
+  const flowBase = ccOrgId
+    ? `/control-center/org/${ccOrgId}/flujos`
+    : "/workflows";
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { session } = useAuth();
+  const { session: tenantSession } = useAuth();
+  const { session: platformSession } = usePlatformAuth();
+
+  const platformToken = platformSession?.token ?? "";
+
+  // Identidad estable: los efectos del studio dependen de `session` y un objeto
+  // nuevo por render dispararía peticiones en bucle.
+  const session = useMemo<Session | null>(() => {
+    if (!platformMode) return tenantSession;
+    if (!platformToken || !ccOrgId) return null;
+    return {
+      token: platformToken,
+      organizationId: ccOrgId,
+      companyName: "",
+      permissions: ["*"],
+    };
+  }, [platformMode, tenantSession, platformToken, ccOrgId]);
+
+  useEffect(() => {
+    if (!platformMode || !ccOrgId || !platformToken) return undefined;
+    setStudioTarget({ orgId: ccOrgId, token: platformToken });
+    return () => setStudioTarget(null);
+  }, [platformMode, ccOrgId, platformToken]);
 
   const panel = searchParams.get("panel");
   const drawer: StudioDrawer | null = isStudioDrawer(panel) ? panel : null;
@@ -356,7 +387,7 @@ export default function WorkflowStudioPage() {
           workflow_version: 2,
         }),
       });
-      navigate(`/workflows/${out.workflow_id}`, {
+      navigate(`${flowBase}/${out.workflow_id}`, {
         replace: true,
         state: { hookSecret: out.hook_secret } satisfies StudioState,
       });
@@ -634,7 +665,7 @@ export default function WorkflowStudioPage() {
       setConfirmLeave(true);
       return;
     }
-    navigate("/workflows");
+    navigate(flowBase);
   }
 
   function selectFromDock(nodeId: string) {
@@ -1051,7 +1082,7 @@ export default function WorkflowStudioPage() {
         cancelLabel="Seguir editando"
         onConfirm={() => {
           setConfirmLeave(false);
-          navigate("/workflows");
+          navigate(flowBase);
         }}
       />
     </div>

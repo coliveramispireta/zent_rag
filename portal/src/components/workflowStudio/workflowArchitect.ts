@@ -4,7 +4,8 @@
  * La UI NO interpreta la respuesta como un WorkflowPlan legacy ni compila
  * grafos: envía el plan al backend y este re-valida, compila y persiste.
  */
-import { api, type Session } from "../../api";
+import type { Session } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 
 export const DESIGN_STATES = [
   "UNDERSTANDING",

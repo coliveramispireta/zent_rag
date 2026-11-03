@@ -5,7 +5,7 @@
  */
 import { ArrowRight, Check, MagicWand, WarningCircle } from "@phosphor-icons/react";
 import { useState } from "react";
-import { api } from "../../api";
+import { studioApi as api } from "../../lib/studioApi";
 import { useAuth } from "../../auth";
 import { Button, ErrorInline, Textarea } from "../ui";
 
